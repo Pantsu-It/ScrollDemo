@@ -12,10 +12,12 @@ import android.view.View;
 
 import pantsu.scrolldemo.scroll_1.Activity_1;
 import pantsu.scrolldemo.scroll_2.Activity_2;
+import pantsu.scrolldemo.scroll_3.Activity_3;
 
 public class MainActivity extends AppCompatActivity {
 
     public static DisplayMetrics displayMetrics;
+    public static int statusBarHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +36,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
         displayMetrics = getMetrics(this);
+        statusBarHeight = getStatusBarHeight();
     }
 
     private DisplayMetrics getMetrics(Activity activity) {
         DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return metrics;
+    }
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     public void onClick(View view) {
@@ -51,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btn2:
                 intent = new Intent(MainActivity.this, Activity_2.class);
+                break;
+            case R.id.btn3:
+                intent = new Intent(MainActivity.this, Activity_3.class);
                 break;
         }
         startActivity(intent);

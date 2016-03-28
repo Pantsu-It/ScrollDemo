@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <pantsu.scrolldemo.scroll_3.DragViewGroup
+        android:id="@+id/dragGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <pantsu.scrolldemo.scroll_3.FadingTwoViewGroup
+            android:id="@+id/fade_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/clock"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/b_clock1"/>
+
+            <ImageView
+                android:id="@+id/clock_collapse"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/b_collapse_clock1"/>
+
+        </pantsu.scrolldemo.scroll_3.FadingTwoViewGroup>
+
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/list_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </android.support.v4.view.ViewPager>
+    </pantsu.scrolldemo.scroll_3.DragViewGroup>
+
+    <ImageView
+        android:id="@+id/setting"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/b_setting1"/>
+</FrameLayout>

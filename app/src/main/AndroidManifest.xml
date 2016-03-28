@@ -26,6 +26,10 @@
             android:name=".scroll_2.Activity_2"
             android:theme="@style/Theme.AppCompat.NoActionBar">
         </activity>
+        <activity
+            android:name=".scroll_3.Activity_3"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
