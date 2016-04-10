@@ -104,7 +104,7 @@ public class DragViewGroup extends LinearLayout {
     }
 
     private void setInterpolator(Context context, ViewDragHelper helper, Interpolator sInterpolator) {
-        scrollerCompat = ScrollerCompat.create(context);
+        scrollerCompat = ScrollerCompat.create(context, sInterpolator);
         try {
             Field mScroller = ViewDragHelper.class.getDeclaredField("mScroller");
             mScroller.setAccessible(true);
@@ -137,6 +137,13 @@ public class DragViewGroup extends LinearLayout {
 
     public void setOnClampListener(OnClampListener listener) {
         mListener = listener;
+    }
+
+    public void scrollChildTo(int scrollX, int scrollY) {
+        LayoutParams params = (LayoutParams) mDragHelper.findTopChildUnder(0, 0).getLayoutParams();
+        params.topMargin = -scrollY;
+        params.leftMargin = -scrollX;
+        mDragHelper.findTopChildUnder(0, 0).setLayoutParams(params);
     }
 
     interface OnClampListener {
