@@ -6,6 +6,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -23,7 +24,7 @@ public class DragViewGroup extends LinearLayout {
     private ViewDragHelper mDragHelper;
     private OnClampListener mListener;
 
-    int leftBound, rightBound, topBound, bottomBound;
+    int maxX, minX, maxY, minY;
 
     private static final Interpolator sInterpolator = new DecelerateInterpolator(1.5f);
     private ScrollerCompat scrollerCompat;
@@ -36,22 +37,22 @@ public class DragViewGroup extends LinearLayout {
         mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
-                leftBound = 0;
-                rightBound = getWidth() - child.getWidth();
-                topBound = 0;
-                bottomBound = getHeight() - child.getHeight();
+                maxX = 0;
+                minX = getWidth() - child.getWidth();
+                maxY = 0;
+                minY = getHeight() - child.getHeight();
                 return true;
             }
 
             @Override
             public int clampViewPositionHorizontal(View child, int left, int dx) {
-                int newLeft = Math.max(Math.min(left, leftBound), rightBound);
+                int newLeft = Math.max(Math.min(left, maxX), minX);
                 return newLeft;
             }
 
             @Override
             public int clampViewPositionVertical(View child, int top, int dy) {
-                int newTop = Math.max(Math.min(top, topBound), bottomBound);
+                int newTop = Math.max(Math.min(top, maxY), minY);
                 return newTop;
             }
 
@@ -68,7 +69,7 @@ public class DragViewGroup extends LinearLayout {
                 super.onViewReleased(releasedChild, xvel, yvel);
 
                 adjustDuration();
-                mDragHelper.flingCapturedView(rightBound, bottomBound, leftBound, topBound);
+                mDragHelper.flingCapturedView(minX, minY, maxX, maxY);
                 postInvalidate();
             }
         });
@@ -135,15 +136,54 @@ public class DragViewGroup extends LinearLayout {
         return true;
     }
 
-    public void setOnClampListener(OnClampListener listener) {
-        mListener = listener;
+    public void setBound(int maxX, int minX, int maxY, int minY) {
+        this.maxX = maxX;
+        this.minX = minX;
+        this.maxY = maxY;
+        this.minY = minY;
     }
 
-    public void scrollChildTo(int scrollX, int scrollY) {
+    /*
+        Calling updateBound() is necessary if this container's LayoutParams has been changed !
+    */
+    public void updateBound() {
+        View child = mDragHelper.findTopChildUnder(0, 0);
+        if (child != null) {
+            maxX = 0;
+            minX = getWidth() - child.getWidth();
+            maxY = 0;
+            minY = getHeight() - child.getHeight();
+            int w1 = getHeight();
+            int w2 = child.getHeight();
+            Log.d("w1", w1 + "");
+            Log.d("w2", w2 + "");
+        }
+    }
+
+    public void dragChildTo(int left, int top) {
+        int newLeft = Math.max(Math.min(left, maxX), minX);
+        int newTop = Math.max(Math.min(top, maxY), minY);
+
         LayoutParams params = (LayoutParams) mDragHelper.findTopChildUnder(0, 0).getLayoutParams();
-        params.topMargin = -scrollY;
-        params.leftMargin = -scrollX;
+        params.leftMargin = newLeft;
+        params.topMargin = newTop;
         mDragHelper.findTopChildUnder(0, 0).setLayoutParams(params);
+        mDragHelper.findTopChildUnder(0, 0).invalidate();
+        requestLayout();
+        invalidate();
+
+//        View mCapturedView = mDragHelper.findTopChildUnder(0, 0);
+//        int clampedX = newLeft;
+//        int clampedY = newTop;
+//        final int oldLeft = mCapturedView.getLeft();
+//        final int oldTop = mCapturedView.getTop();
+//
+//        ViewCompat.offsetLeftAndRight(mCapturedView, clampedX - oldLeft);
+//        ViewCompat.offsetTopAndBottom(mCapturedView, clampedY - oldTop);
+    }
+
+    public void setOnClampListener(OnClampListener listener) {
+        mListener = listener;
     }
 
     interface OnClampListener {

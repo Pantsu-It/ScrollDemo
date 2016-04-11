@@ -42,8 +42,8 @@ public class Activity_2 extends Activity implements View.OnTouchListener {
     private void configureLayout() {
         final int width = MainActivity.displayMetrics.widthPixels;
         int height = MainActivity.displayMetrics.heightPixels - MainActivity.statusBarHeight;
-        int w1 = 70, _w = 870;
-        int h1 = 100, h2 = 84, h3 = 100, _h = 1160;
+        final int w1 = 70, _w = 870;
+        final int h1 = 100, h2 = 84, h3 = 100, _h = 1160;
         int w1_banner = 118, _w_banner = 2406;
         final int h_banner = 188, h_container = height - h1 - h2 - h3, h_container_shrink = h_container - h_banner;
 
@@ -78,8 +78,8 @@ public class Activity_2 extends Activity implements View.OnTouchListener {
 
                             dragViewGroupSlide.condition = true;
                         }
-//                        dragViewGroup.scrollChildTo(scroll_top.getScrollX(),scroll_left.getScrollY());
-//                        dragViewGroup.postInvalidate();
+                        dragViewGroup.updateBound();
+                        dragViewGroup.dragChildTo(-scroll_top.getScrollX(), -scroll_left.getScrollY());
                     }
                 }
         );
@@ -127,12 +127,13 @@ public class Activity_2 extends Activity implements View.OnTouchListener {
                 if (dragViewGroupSlide.condition) {
                     title.setImageResource(R.drawable.a_title_2);
                     container_center.setLayoutParams(getLinearParams(width, h_container_shrink));
+                    dragViewGroup.setBound(0, width - _w, 0, h_container_shrink - _h);
                 } else {
                     title.setImageResource(R.drawable.a_title);
                     container_center.setLayoutParams(getLinearParams(width, h_container));
+                    dragViewGroup.setBound(0, width - _w, 0, h_container - _h);
                 }
-                dragViewGroup.scrollChildTo(scroll_top.getScrollX(),scroll_left.getScrollY());
-                dragViewGroup.requestLayout();
+                dragViewGroup.dragChildTo(-scroll_top.getScrollX(), -scroll_left.getScrollY());
             }
         });
     }

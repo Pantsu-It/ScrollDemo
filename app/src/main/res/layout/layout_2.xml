@@ -125,6 +125,7 @@
 
                 <pantsu.scrolldemo.scroll_2.DragViewGroup
                     android:id="@+id/dragGroup"
+                    android:background="#25e78e"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
 
