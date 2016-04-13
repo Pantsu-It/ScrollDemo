@@ -14,6 +14,7 @@ import android.widget.ScrollView;
 
 import java.lang.reflect.Field;
 
+import pantsu.scrolldemo.MainActivity;
 import pantsu.scrolldemo.R;
 
 /**
@@ -120,7 +121,7 @@ public class DragViewGroup_Slide extends LinearLayout {
 
     /*
         java.lang.IllegalStateException: Cannot settleCapturedViewAt outside of a call to Callback#onViewReleased
-        mDragHelper.settleCapturedViewAt(maxX, maxY);
+        when calling mDragHelper.settleCapturedViewAt(maxX, maxY) to set position of child directly !;
     */
     public void slideIn() {
         mDragHelper.smoothSlideViewTo(mDragHelper.findTopChildUnder(0, 0), maxX, minY);
@@ -205,7 +206,7 @@ public class DragViewGroup_Slide extends LinearLayout {
         view.getLocationOnScreen(location);
         int x = location[0];
         int y = location[1];
-        if (ev.getX() < x || ev.getX() > (x + view.getWidth()) || ev.getY() < y || ev.getY() > (y + view.getHeight())) {
+        if (ev.getRawX()< x || ev.getRawX() > (x + view.getWidth()) || ev.getRawY() < y || ev.getRawY() > (y + view.getHeight())) {
             return false;
         }
         return true;

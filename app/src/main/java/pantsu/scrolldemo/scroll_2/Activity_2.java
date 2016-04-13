@@ -69,16 +69,17 @@ public class Activity_2 extends Activity implements View.OnTouchListener {
                             dragViewGroupSlide.slideIn();
                             title.setImageResource(R.drawable.a_title);
                             container_center.setLayoutParams(getLinearParams(width, h_container));
+                            dragViewGroup.setBound(0, width - _w, 0, h_container - _h);
 
                             dragViewGroupSlide.condition = false;
                         } else {
                             dragViewGroupSlide.slideOut();
                             title.setImageResource(R.drawable.a_title_2);
                             container_center.setLayoutParams(getLinearParams(width, h_container_shrink));
+                            dragViewGroup.setBound(0, width - _w, 0, h_container_shrink - _h);
 
                             dragViewGroupSlide.condition = true;
                         }
-                        dragViewGroup.updateBound();
                         dragViewGroup.dragChildTo(-scroll_top.getScrollX(), -scroll_left.getScrollY());
                     }
                 }

@@ -145,6 +145,7 @@ public class DragViewGroup extends LinearLayout {
 
     /*
         Calling updateBound() is necessary if this container's LayoutParams has been changed !
+        but setLayoutParams() does not impact getHeight() immediately~
     */
     public void updateBound() {
         View child = mDragHelper.findTopChildUnder(0, 0);
@@ -169,9 +170,8 @@ public class DragViewGroup extends LinearLayout {
         params.topMargin = newTop;
         mDragHelper.findTopChildUnder(0, 0).setLayoutParams(params);
         mDragHelper.findTopChildUnder(0, 0).invalidate();
-        requestLayout();
-        invalidate();
 
+        // another method to try dragChildTo
 //        View mCapturedView = mDragHelper.findTopChildUnder(0, 0);
 //        int clampedX = newLeft;
 //        int clampedY = newTop;
@@ -180,6 +180,7 @@ public class DragViewGroup extends LinearLayout {
 //
 //        ViewCompat.offsetLeftAndRight(mCapturedView, clampedX - oldLeft);
 //        ViewCompat.offsetTopAndBottom(mCapturedView, clampedY - oldTop);
+//        mCapturedView.invalidate();
     }
 
     public void setOnClampListener(OnClampListener listener) {
