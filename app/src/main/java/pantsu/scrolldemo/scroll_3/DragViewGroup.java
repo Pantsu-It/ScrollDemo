@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -36,7 +37,6 @@ public class DragViewGroup extends LinearLayout {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
                 if (child.getId() == R.id.list_pager) {
-                    status = STATUS_DRAG;
                     return true;
                 }
                 return false;
@@ -72,7 +72,7 @@ public class DragViewGroup extends LinearLayout {
                 super.onViewReleased(releasedChild, xvel, yvel);
 
                 int edgeSettle = atExtactEdge(curY);
-                if (edgeSettle == status) {
+                if (edgeSettle != STATUS_UNKNOWN) {
                     status = edgeSettle;
                     return;
                 }
@@ -129,10 +129,107 @@ public class DragViewGroup extends LinearLayout {
         maxEdge = (int) (maxY - (maxY - minY) * edgeRate);
     }
 
+    private float xDelta, yDelta, xLast, yLast, xDown, yDown;
+    private boolean decideIntercept, intercepted;
+//
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent event) {
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                xDelta = yDelta = 0f;
+//                xDown = event.getX();
+//                yDown = event.getY();
+//                mDragHelper.processTouchEvent(event);
+//
+//                decideIntercept = false;
+//                intercepted = false;
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                if (status == STATUS_SCROLL) {
+//                    intercepted = true;
+//                    decideIntercept = true;
+//                    mDragHelper.processTouchEvent(event);
+//                    return true;
+//                }
+//
+//                if (!decideIntercept) {
+//                    float curX = event.getX();
+//                    float curY = event.getY();
+//                    xDelta = curX - xDown;
+//                    yDelta = curY - yDown;
+//
+//
+//                    if (status == STATUS_COLLAPSE) {
+//                        if (yDelta < 0 && Math.abs(yDelta) > Math.abs(xDelta)) {
+//                            decideIntercept = true;
+//                            intercepted = false;
+//                        }
+//                    } else if (Math.abs(yDelta) > Math.abs(xDelta)) {
+//                        mDragHelper.processTouchEvent(event);
+//                        intercepted = true;
+//                        decideIntercept = true;
+//                        return true;
+//                    }
+//                } else {
+//                    mDragHelper.processTouchEvent(event);
+//                    return true;
+//                }
+//                break;
+//        }
+//
+//        return super.dispatchTouchEvent(event);
+//    private static final int STATUS_EXPEND = 0, STATUS_COLLAPSE = 1, STATUS_DRAG = 2, STATUS_SCROLL = 3,
+
+//    }
+
+//            STATUS_UNKNOWN = -1;
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        mDragHelper.shouldInterceptTouchEvent(event);
-        return true;
+        Log.d("status", "" + status);
+        Log.d("isTop", "" + Activity_3.isOnTop());
+        Log.d("scrollY", "" + Activity_3.currentScrollY());
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                xDelta = yDelta = 0f;
+                xDown = event.getX();
+                yDown = event.getY();
+                mDragHelper.processTouchEvent(event);
+
+                decideIntercept = false;
+                intercepted = false;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (status == STATUS_SCROLL) {
+                    intercepted = true;
+                    decideIntercept = true;
+                    break;
+                }
+
+                if (!decideIntercept) {
+                    float curX = event.getX();
+                    float curY = event.getY();
+                    xLast = curX;
+                    yLast = curY;
+                    xDelta = curX - xDown;
+                    yDelta = curY - yDown;
+                    if (!Activity_3.isOnTop()) {
+                        intercepted = false;
+                    } else if (status == STATUS_COLLAPSE && yDelta < 0 && Math.abs(yDelta) > Math.abs(xDelta)) {
+                        intercepted = false;
+                    } else if (Math.abs(yDelta) > 0.7f * Math.abs(xDelta)) {
+                        intercepted = true;
+                    }
+                    decideIntercept = true;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                break;
+        }
+
+        return intercepted;
     }
 
     @Override
@@ -141,9 +238,25 @@ public class DragViewGroup extends LinearLayout {
         return true;
     }
 
+    public void scrollToAdjust() {
+        if (status == STATUS_COLLAPSE) {
+            LayoutParams params = (LayoutParams) getChildAt(1).getLayoutParams();
+            params.topMargin = minY - maxY;
+            getChildAt(1).setLayoutParams(params);
+            getChildAt(1).invalidate();
+        } else {
+            LayoutParams params = (LayoutParams) getChildAt(1).getLayoutParams();
+            params.topMargin = 0;
+            getChildAt(1).setLayoutParams(params);
+            getChildAt(1).invalidate();
+        }
+    }
+
+
     public void setOnClampListener(OnClampListener listener) {
         cListener = listener;
     }
+
 
     interface OnClampListener {
         void onClampHorizontal(int left);

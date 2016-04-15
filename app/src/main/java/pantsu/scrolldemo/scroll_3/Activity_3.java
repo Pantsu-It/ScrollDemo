@@ -1,10 +1,12 @@
 package pantsu.scrolldemo.scroll_3;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.Scroller;
+
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 
 import pantsu.scrolldemo.MainActivity;
 import pantsu.scrolldemo.R;
@@ -31,7 +37,7 @@ public class Activity_3 extends Activity {
 
     int width = MainActivity.displayMetrics.widthPixels;
     int height = MainActivity.displayMetrics.heightPixels - MainActivity.statusBarHeight;
-    public int h_clock = 766, h_clock_collapse = 280, h_setting = 120,
+    public int h_clock = 796, h_clock_collapse = 310, h_setting = 120,
             h_list = height - h_clock_collapse - h_setting;
 
     int[] bgColors = {0xff00816F, 0xff1E7DA9, 0xff369245, 0xff838F97};
@@ -55,7 +61,6 @@ public class Activity_3 extends Activity {
         fade_group = (FadingTwoViewGroup) findViewById(R.id.fade_group);
         list_pager = (ViewPager) findViewById(R.id.list_pager);
         setting = (ImageView) findViewById(R.id.setting);
-
 
         setRelativeParams(clock, width, h_clock);
         setRelativeParams(clock_collapse, width, h_clock_collapse);
@@ -94,7 +99,6 @@ public class Activity_3 extends Activity {
     }
 
     private void initialView() {
-//        fade_group.setBackgroundColor(bgColors[0]);
         fade_group.setFadingRate(0);
 
         drag_group.setRange(0, 0, h_clock_collapse, h_clock);
@@ -123,6 +127,7 @@ public class Activity_3 extends Activity {
                 currentPage = position;
 
                 drag_group.setBackgroundColor(bgColors[position]);
+                drag_group.scrollToAdjust();
                 clock.setImageResource(clockImage[position]);
                 clock_collapse.setImageResource(clockCollapseImage[position]);
             }
@@ -132,6 +137,8 @@ public class Activity_3 extends Activity {
 
             }
         });
+
+
 /*
         list_pager.setOnTouchListener(new View.OnTouchListener() {
             float downX, downY;
@@ -186,7 +193,11 @@ public class Activity_3 extends Activity {
 
     public static boolean isOnTop() {
         int scrollY = scrollViews[currentPage].getScrollY();
-        return scrollY == 0;
+        return scrollY < 2;
+    }
+
+    public static int currentScrollY() {
+        return scrollViews[currentPage].getScrollY();
     }
 
     private class MyPagerAdapter extends PagerAdapter {
@@ -207,59 +218,12 @@ public class Activity_3 extends Activity {
 
         @Override
         public Object instantiateItem(ViewGroup container, final int position) {
-            View item = View.inflate(Activity_3.this, R.layout.pager_item, null);
+            ScrollView item = (ScrollView) View.inflate(Activity_3.this, R.layout.pager_item, null);
             ImageView list = (ImageView) item.findViewById(R.id.list);
             list.setImageResource(listIds[position]);
             container.addView(item);
 
-            scrollViews[position] = (ScrollView) item;
-            /*
-            scrollViews[position].setOnTouchListener(new View.OnTouchListener() {
-                float downX, downY;
-                float moveX, moveY;
-
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            Log.d("event", "scroll - down");
-
-                            downX = event.getX();
-                            downY = event.getY();
-                            break;
-                        case MotionEvent.ACTION_MOVE:
-                            Log.d("event", "scroll - move");
-
-                            moveX = event.getX();
-                            moveY = event.getY();
-                            if (Math.abs(downY - moveY) > 1.5 * Math.abs(downX - moveX)) {
-                                Log.d("event", "scroll - rechange ------------------------------------------------");
-
-                                drag_group.dispatchTouchEvent(getUpEvent(moveX, moveY));
-                                try {
-                                    Thread.sleep(300);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                drag_group.dispatchTouchEvent(getDownEvent(moveX, moveY));
-                                try {
-                                    Thread.sleep(300);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                drag_group.dispatchTouchEvent(getUpEvent(moveX, moveY));
-                                return false;
-                            }
-                            break;
-                        case MotionEvent.ACTION_UP:
-                        case MotionEvent.ACTION_CANCEL:
-                            Log.d("event", "scroll - up");
-                            break;
-                    }
-                    return false;
-                }
-            });
-            */
+            scrollViews[position] = item;
             return item;
         }
 
