@@ -1,12 +1,10 @@
 package pantsu.scrolldemo.scroll_3;
 
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.Scroller;
-
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 
 import pantsu.scrolldemo.MainActivity;
 import pantsu.scrolldemo.R;
@@ -218,7 +212,7 @@ public class Activity_3 extends Activity {
 
         @Override
         public Object instantiateItem(ViewGroup container, final int position) {
-            ScrollView item = (ScrollView) View.inflate(Activity_3.this, R.layout.pager_item, null);
+            ScrollView item = (ScrollView) View.inflate(Activity_3.this, R.layout.item_page, null);
             ImageView list = (ImageView) item.findViewById(R.id.list);
             list.setImageResource(listIds[position]);
             container.addView(item);
