@@ -188,15 +188,15 @@ public class Activity_3 extends Activity {
         return MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, x, y, 0);
     }
 
-    private static int currentPage = 0;
-    public static ScrollView[] scrollViews = new ScrollView[4];
+    private int currentPage = 0;
+    public ScrollView[] scrollViews = new ScrollView[4];
 
-    public static boolean isOnTop() {
+    public boolean isOnTop() {
         int scrollY = scrollViews[currentPage].getScrollY();
         return scrollY < 2;
     }
 
-    public static int currentScrollY() {
+    public int currentScrollY() {
         return scrollViews[currentPage].getScrollY();
     }
 

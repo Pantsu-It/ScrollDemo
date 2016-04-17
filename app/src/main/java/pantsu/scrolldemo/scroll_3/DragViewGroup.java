@@ -1,5 +1,6 @@
 package pantsu.scrolldemo.scroll_3;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
@@ -30,8 +31,12 @@ public class DragViewGroup extends LinearLayout {
     float edgeRate = 0.12f;
     int minEdge, maxEdge;
 
+    private Activity_3 mContext;
+
     public DragViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        mContext = (Activity_3) context;
 
         mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
@@ -187,8 +192,8 @@ public class DragViewGroup extends LinearLayout {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         Log.d("status", "" + status);
-        Log.d("isTop", "" + Activity_3.isOnTop());
-        Log.d("scrollY", "" + Activity_3.currentScrollY());
+        Log.d("isTop", "" + mContext.isOnTop());
+        Log.d("scrollY", "" + mContext.currentScrollY());
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -214,7 +219,7 @@ public class DragViewGroup extends LinearLayout {
                     yLast = curY;
                     xDelta = curX - xDown;
                     yDelta = curY - yDown;
-                    if (!Activity_3.isOnTop()) {
+                    if (!mContext.isOnTop()) {
                         intercepted = false;
                     } else if (status == STATUS_COLLAPSE && yDelta < 0 && Math.abs(yDelta) > Math.abs(xDelta)) {
                         intercepted = false;
