@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -27,20 +28,14 @@ public class DragBackGroup extends LinearLayout {
     private int curX;
     float conditionRate = 0.33f;
 
-    boolean releaseMark;
-
     public DragBackGroup(final Context context, AttributeSet attrs) {
         super(context, attrs);
+
 
         mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
-                if (getChildCount() > 0) {
-                    View topView = getChildAt(0);
-                    if (topView instanceof ListView || topView instanceof ScrollView) {
-                        scrollView = topView;
-                    }
-                }
+                findScrollView();
                 return child == scrollView;
             }
 
@@ -57,8 +52,12 @@ public class DragBackGroup extends LinearLayout {
 
             @Override
             public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
-                if (releaseMark && left == maxX) {
+                Log.d("d", "" + left);
+                if (Math.abs(maxX - left) < 8) {
                     fListener.finish();
+                } else if (startScroll && Math.abs(minX - left) < 4) {
+                    startScroll = false;
+                    isScrolling = false;
                 }
             }
 
@@ -79,8 +78,8 @@ public class DragBackGroup extends LinearLayout {
                     mDragHelper.smoothSlideViewTo(scrollView, maxX, 0);
                     postInvalidate();
                 }
-
-                releaseMark = true;
+                startScroll = true;
+                isScrolling = true;
             }
 
         });
@@ -93,6 +92,16 @@ public class DragBackGroup extends LinearLayout {
         }
     }
 
+    private void findScrollView() {
+        if (scrollView == null && getChildCount() > 0) {
+            View topView = getChildAt(0);
+            if (topView instanceof ListView || topView instanceof ScrollView) {
+                scrollView = topView;
+            }
+        }
+    }
+
+
     public void setRange(int minX, int maxX, int minY, int maxY) {
         this.minX = minX;
         this.maxX = maxX;
@@ -102,6 +111,8 @@ public class DragBackGroup extends LinearLayout {
 
     private float xDelta, yDelta, xDown, yDown;
     private boolean decideIntercept, intercepted;
+    private int pointCount = 0;
+    private boolean startScroll = false, isScrolling = false;
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -113,10 +124,16 @@ public class DragBackGroup extends LinearLayout {
                 yDown = event.getY();
                 mDragHelper.processTouchEvent(event);
 
-                releaseMark = false;
+                if (isScrolling) {
+                    startScroll = false;
+                    isScrolling = false;
 
-                decideIntercept = false;
-                intercepted = false;
+                    decideIntercept = true;
+                    intercepted = true;
+                } else {
+                    decideIntercept = false;
+                    intercepted = false;
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (!decideIntercept) {
@@ -125,13 +142,17 @@ public class DragBackGroup extends LinearLayout {
                     xDelta = curX - xDown;
                     yDelta = curY - yDown;
 
-                    if (Math.abs(xDelta) > Math.abs(yDelta)) {
-                        intercepted = true;
-                    } else if (scrollView == null || !(scrollView.canScrollVertically(-1) || scrollView.canScrollVertically(1))) {
-                        intercepted = true;
-                    }
+                    if (pointCount++ >= 4) {
+                        if (xDelta < 0) {
+                            intercepted = false;
+                        } else if (xDelta > 1.2f * Math.abs(yDelta)) {
+                            intercepted = true;
+                        } else if (scrollView == null || !(scrollView.canScrollVertically(-1) || scrollView.canScrollVertically(1))) {
+                            intercepted = true;
+                        }
 
-                    decideIntercept = true;
+                        decideIntercept = true;
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -152,6 +173,11 @@ public class DragBackGroup extends LinearLayout {
         fListener = listener;
     }
 
+    public void scrollToMax() {
+        findScrollView();
+        mDragHelper.smoothSlideViewTo(scrollView, maxX, 0);
+        postInvalidate();
+    }
 
     interface OnFinishListener {
         void finish();

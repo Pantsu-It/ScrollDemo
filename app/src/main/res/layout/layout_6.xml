@@ -8,6 +8,7 @@
     tools:context=".scroll_6.Activity_6">
 
     <ScrollView
+        android:background="#ffffffff"
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

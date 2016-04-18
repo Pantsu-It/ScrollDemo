@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         startActivity(intent);
+        if (view.getId() == R.id.btn6)
+            overridePendingTransition(R.anim.activity_ani_enter, R.anim.activity_ani_exist);
     }
 
 }

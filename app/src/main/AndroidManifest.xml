@@ -10,7 +10,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +33,9 @@
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
         <activity
             android:name=".scroll_6.Activity_6"
-            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+            android:theme="@style/AppBaseTheme">
+            <!--android:theme="@android:style/Theme.Translucent.NoTitleBar"-->
+        </activity>
     </application>
 
 </manifest>
