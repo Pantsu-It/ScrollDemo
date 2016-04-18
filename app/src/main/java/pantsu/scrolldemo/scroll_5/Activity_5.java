@@ -2,57 +2,53 @@ package pantsu.scrolldemo.scroll_5;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
-import pantsu.scrolldemo.MainActivity;
 import pantsu.scrolldemo.R;
-import pantsu.scrolldemo.scroll_6.DragBackGroup;
 
 /**
  * Created by Pantsu on 2016/3/22.
  * <p/>
  * Blog -> http://pantsu-it.github.io/
  */
-public class Activity_5 extends Activity implements View.OnTouchListener {
+public class Activity_5 extends Activity {
 
-    DragBackGroup dragBackGroup;
-    ScrollView scrollView;
+    MyRecyclerView recyclerView;
+    RecyclerView.LayoutManager layoutManager;
+    RecyclerView.Adapter<SimpleAdapter.ViewHolder> holderAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.layout_6);
+        setContentView(R.layout.layout_5);
         configureLayout();
     }
 
     private void configureLayout() {
-        int width = MainActivity.displayMetrics.widthPixels;
-        int height = MainActivity.displayMetrics.heightPixels - MainActivity.statusBarHeight;
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView = (MyRecyclerView) findViewById(R.id.recycleView);
+        holderAdapter = new SimpleAdapter(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(holderAdapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setHasFixedSize(true);
 
-        dragBackGroup = (DragBackGroup) findViewById(R.id.dragBackGroup);
-        dragBackGroup.setRange(0, width, 0, 0);
+        recyclerView.setOnSlideOutListener(new MyRecyclerView.OnSlideOutListener() {
+            @Override
+            public void OnSlideOut(View changedView) {
+                SimpleAdapter adapter = (SimpleAdapter) recyclerView.getAdapter();
+                int position = adapter.getPosition(changedView);
+                if (position != -1) {
+                    adapter.notifyItemRemoved(position);
+                    adapter.remove(position);
+                    adapter.notifyItemRangeChanged(position, adapter.getItemCount());
+                }
+            }
+        });
 
-        scrollView = (ScrollView) findViewById(R.id.scrollView);
-        LinearLayout linearLayout = new LinearLayout(this);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        for (int i = 0; i < 10; i++) {
-            linearLayout.addView(getView(), i);
-        }
-        scrollView.addView(linearLayout);
     }
-
-    private View getView() {
-        return View.inflate(this, R.layout.item_cell, null);
-    }
-
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        return false;
-    }
-
 }

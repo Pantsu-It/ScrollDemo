@@ -1,4 +1,4 @@
-package pantsu.scrolldemo.scroll_6;
+package pantsu.scrolldemo.scroll_5;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -35,7 +35,6 @@ public class DragBackGroup extends LinearLayout {
         mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
-                findScrollView();
                 return child == scrollView;
             }
 
@@ -92,16 +91,6 @@ public class DragBackGroup extends LinearLayout {
         }
     }
 
-    private void findScrollView() {
-        if (scrollView == null && getChildCount() > 0) {
-            View topView = getChildAt(0);
-            if (topView instanceof ListView || topView instanceof ScrollView) {
-                scrollView = topView;
-            }
-        }
-    }
-
-
     public void setRange(int minX, int maxX, int minY, int maxY) {
         this.minX = minX;
         this.maxX = maxX;
@@ -123,8 +112,6 @@ public class DragBackGroup extends LinearLayout {
                 xDown = event.getX();
                 yDown = event.getY();
                 mDragHelper.processTouchEvent(event);
-
-                pointCount = 0;
 
                 if (isScrolling) {
                     startScroll = false;
@@ -173,12 +160,6 @@ public class DragBackGroup extends LinearLayout {
 
     public void setOnFinishListener(OnFinishListener listener) {
         fListener = listener;
-    }
-
-    public void scrollToMax() {
-        findScrollView();
-        mDragHelper.smoothSlideViewTo(scrollView, maxX, 0);
-        postInvalidate();
     }
 
     interface OnFinishListener {

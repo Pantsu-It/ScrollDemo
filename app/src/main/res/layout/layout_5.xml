@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <pantsu.scrolldemo.scroll_6.DragBackGroup xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/dragBackGroup"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".scroll_6.Activity_6">
 
-    <ScrollView
-        android:background="#ffffffff"
-        android:id="@+id/scrollView"
+    <pantsu.scrolldemo.scroll_5.MyRecyclerView
+        android:background="#ffaaaaaa"
+        android:id="@+id/recycleView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </ScrollView>
+    </pantsu.scrolldemo.scroll_5.MyRecyclerView>
 
 </pantsu.scrolldemo.scroll_6.DragBackGroup>
