@@ -1,7 +1,9 @@
 package pantsu.scrolldemo.scroll_3;
 
-import android.app.Activity;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
+import android.os.SystemClock;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
@@ -28,7 +30,7 @@ public class DragViewGroup extends LinearLayout {
 
     private int minY, maxY;
     private int curY;
-    float edgeRate = 0.12f;
+    float edgeRate = 0.18f;
     int minEdge, maxEdge;
 
     private Activity_3 mContext;
@@ -59,11 +61,30 @@ public class DragViewGroup extends LinearLayout {
                 return newTop;
             }
 
+            @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             @Override
             public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
                 if (atExtactEdge(top) != STATUS_UNKNOWN && status == STATUS_SCROLL) {
                     status = atExtactEdge(top);
                     expected_status = 1 - status;
+
+
+                } else if (atExtactEdge(top) == STATUS_COLLAPSE) {
+                    View view =DragViewGroup.this.findViewById(R.id.list_pager);
+
+                    if(status == STATUS_EXPEND) {
+                        MotionEvent up = Activity_3.getUpEvent(lastX, lastY);
+                        MotionEvent down = Activity_3.getDownEvent(lastX, lastY-480);
+                        DragViewGroup.this.dispatchTouchEvent(up);
+                        DragViewGroup.this.dispatchTouchEvent(down);
+                    }else {
+                        MotionEvent up = Activity_3.getUpEvent(lastX, lastY);
+                        MotionEvent down = Activity_3.getDownEvent(lastX, lastY);
+                        DragViewGroup.this.dispatchTouchEvent(up);
+                        DragViewGroup.this.dispatchTouchEvent(down);
+                    }
+
+
                 }
 
                 if (cListener != null) {
@@ -134,66 +155,15 @@ public class DragViewGroup extends LinearLayout {
         maxEdge = (int) (maxY - (maxY - minY) * edgeRate);
     }
 
-    private float xDelta, yDelta, xLast, yLast, xDown, yDown;
+    private float xDelta, yDelta, xDown, yDown;
     private boolean decideIntercept, intercepted;
-//
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent event) {
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                xDelta = yDelta = 0f;
-//                xDown = event.getX();
-//                yDown = event.getY();
-//                mDragHelper.processTouchEvent(event);
-//
-//                decideIntercept = false;
-//                intercepted = false;
-//                break;
-//            case MotionEvent.ACTION_MOVE:
-//                if (status == STATUS_SCROLL) {
-//                    intercepted = true;
-//                    decideIntercept = true;
-//                    mDragHelper.processTouchEvent(event);
-//                    return true;
-//                }
-//
-//                if (!decideIntercept) {
-//                    float curX = event.getX();
-//                    float curY = event.getY();
-//                    xDelta = curX - xDown;
-//                    yDelta = curY - yDown;
-//
-//
-//                    if (status == STATUS_COLLAPSE) {
-//                        if (yDelta < 0 && Math.abs(yDelta) > Math.abs(xDelta)) {
-//                            decideIntercept = true;
-//                            intercepted = false;
-//                        }
-//                    } else if (Math.abs(yDelta) > Math.abs(xDelta)) {
-//                        mDragHelper.processTouchEvent(event);
-//                        intercepted = true;
-//                        decideIntercept = true;
-//                        return true;
-//                    }
-//                } else {
-//                    mDragHelper.processTouchEvent(event);
-//                    return true;
-//                }
-//                break;
-//        }
-//
-//        return super.dispatchTouchEvent(event);
-//    private static final int STATUS_EXPEND = 0, STATUS_COLLAPSE = 1, STATUS_DRAG = 2, STATUS_SCROLL = 3,
 
-//    }
-
-//            STATUS_UNKNOWN = -1;
+    private float lastX, lastY;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         Log.d("status", "" + status);
         Log.d("isTop", "" + mContext.isOnTop());
-        Log.d("scrollY", "" + mContext.currentScrollY());
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -215,17 +185,26 @@ public class DragViewGroup extends LinearLayout {
                 if (!decideIntercept) {
                     float curX = event.getX();
                     float curY = event.getY();
-                    xLast = curX;
-                    yLast = curY;
+                    lastX = curX;
+                    lastY = curY;
                     xDelta = curX - xDown;
                     yDelta = curY - yDown;
-                    if (!mContext.isOnTop()) {
+
+                    if (Math.abs(yDelta) > 0.4f * Math.abs(xDelta)) {
+                        if (status == STATUS_COLLAPSE) {
+                            if (!mContext.isOnTop() || yDelta < 0)
+                                intercepted = false;
+                            else
+                                intercepted = true;
+                        } else if (status == STATUS_EXPEND) {
+                            intercepted = true;
+                        } else {
+                            SystemClock.currentThreadTimeMillis();
+                        }
+                    } else {
                         intercepted = false;
-                    } else if (status == STATUS_COLLAPSE && yDelta < 0 && Math.abs(yDelta) > Math.abs(xDelta)) {
-                        intercepted = false;
-                    } else if (Math.abs(yDelta) > 0.7f * Math.abs(xDelta)) {
-                        intercepted = true;
                     }
+
                     decideIntercept = true;
                 }
                 break;

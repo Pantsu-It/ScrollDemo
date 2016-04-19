@@ -131,47 +131,6 @@ public class Activity_3 extends Activity {
 
             }
         });
-
-
-/*
-        list_pager.setOnTouchListener(new View.OnTouchListener() {
-            float downX, downY;
-            float moveX, moveY;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        Log.d("event", "list - down");
-
-                        downX = event.getX();
-                        downY = event.getY();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        Log.d("event", "list - move");
-
-                        moveX = event.getX();
-                        moveY = event.getY();
-                        if (Math.abs(downY - moveY) > Math.abs(downX - moveX)) {
-                            Log.d("event", "list - rechange ------------------------------------------------");
-                            list_pager.dispatchTouchEvent(getUpEvent(moveX, moveY));
-                            try {
-                                Thread.sleep(300);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            drag_group.dispatchTouchEvent(getDownEvent(moveX, moveY));
-                        }
-                        break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        Log.d("event", "list - up");
-                        break;
-                }
-                return false;
-            }
-        });
-        */
     }
 
     public static MotionEvent getDownEvent(float x, float y) {
@@ -187,11 +146,11 @@ public class Activity_3 extends Activity {
 
     public boolean isOnTop() {
         int scrollY = scrollViews[currentPage].getScrollY();
-        return scrollY < 2;
+        return scrollY < 10;
     }
 
-    public int currentScrollY() {
-        return scrollViews[currentPage].getScrollY();
+    public void scrollToTop() {
+        scrollViews[currentPage].scrollTo(0, 0);
     }
 
     private class MyPagerAdapter extends PagerAdapter {
