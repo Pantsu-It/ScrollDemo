@@ -164,7 +164,7 @@ public class MyRecyclerView extends RecyclerView {
                     xDelta = curX - xDown;
                     yDelta = curY - yDown;
 
-                    if (pointCount++ >= 1) {
+                    if (pointCount++ >= 2) {
                         if (xDelta > 0) {
                             intercepted = false;
                         } else if (Math.abs(xDelta) > 1.6f * Math.abs(yDelta)) {
@@ -182,9 +182,11 @@ public class MyRecyclerView extends RecyclerView {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if (decideIntercept) {
                 if (intercepted) {
+                    // directly accept motion-event while touch last scrolling view
                     mDragHelper.processTouchEvent(event);
                     return true;
                 } else {
+                    // reject motion-event because of touching different view while last view is still scrolling
                     return false;
                 }
             } else {
@@ -200,6 +202,7 @@ public class MyRecyclerView extends RecyclerView {
                 return true;
             }
         } else {
+            // don't deliver any motion-event to views when having not decided which view to deal with motion-events~
             return false;
         }
 
