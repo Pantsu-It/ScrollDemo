@@ -170,7 +170,6 @@ public class MyRecyclerView extends RecyclerView {
                         } else if (Math.abs(xDelta) > 1.6f * Math.abs(yDelta)) {
                             intercepted = true;
                         }
-
                         decideIntercept = true;
                     }
                 }
