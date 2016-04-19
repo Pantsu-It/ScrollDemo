@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import pantsu.scrolldemo.MainActivity;
+import pantsu.scrolldemo.R;
 
 /**
  * Created by Pants on 2016/4/18.
@@ -39,12 +40,11 @@ public class MyRecyclerView extends RecyclerView {
         mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
-                if (lastCapturedView == child){
+                if (lastCapturedView == child) {
                     int y = (int) child.getY();
                     setRange(-MainActivity.displayMetrics.widthPixels, 0, y, y);
                     return true;
-                }
-                else if (child.getTag() != null && ((String) child.getTag()).equals("item")) {
+                } else if (child.getTag(R.id.tag_type) != null && ((String) child.getTag(R.id.tag_type)).equals("item")) {
                     int y = (int) child.getY();
                     setRange(-MainActivity.displayMetrics.widthPixels, 0, y, y);
                     lastCapturedView = child;
@@ -71,11 +71,6 @@ public class MyRecyclerView extends RecyclerView {
                     sListener.OnSlideOut(changedView);
 
                     lastCapturedView = null;
-                } else if (startScroll && Math.abs(maxX - left) < 4) {
-                    startScroll = false;
-                    isScrolling = false;
-
-                    lastCapturedView = null;
                 }
             }
 
@@ -96,9 +91,7 @@ public class MyRecyclerView extends RecyclerView {
                     mDragHelper.smoothSlideViewTo(releasedChild, maxX, maxY);
                     postInvalidate();
                 }
-                Log.d("maxY", String.valueOf(maxY));
 
-                startScroll = true;
                 isScrolling = true;
             }
 
@@ -123,7 +116,7 @@ public class MyRecyclerView extends RecyclerView {
     private float xDelta, yDelta, xDown, yDown;
     private boolean decideIntercept, intercepted;
     private int pointCount = 0;
-    private boolean startScroll = false, isScrolling = false;
+    private boolean  isScrolling = false;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
@@ -139,9 +132,8 @@ public class MyRecyclerView extends RecyclerView {
                 yDown = event.getY();
 
                 pointCount = 0;
-
-                if (isScrolling) {
-                    startScroll = false;
+                // the last captured view is scrolling or has been removed~
+                if (isScrolling && lastCapturedView != null) {
                     isScrolling = false;
 
                     View nowView = mDragHelper.findTopChildUnder((int) event.getX(), (int) event.getY());

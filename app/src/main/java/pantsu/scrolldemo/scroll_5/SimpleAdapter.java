@@ -43,9 +43,9 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
         dataList = new ArrayList<>();
         for (int i = 0; i < titleLength; i++) {
             Map<Integer, String> map = new HashMap<>();
-            map.put(0, i + "");
+            map.put(0, String.valueOf(i));
             map.put(1, title[i]);
-            map.put(2, hot_icon[i] + "");
+            map.put(2, String.valueOf(hot_icon[i]));
             map.put(3, hot_reply[i]);
             dataList.add(map);
         }
@@ -61,11 +61,10 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
     }
 
     public int getPosition(View changedView) {
-        String title = ((TextView) changedView.findViewById(R.id.title)).getText().toString();
-//        int i = Integer.parseInt(tag.substring(5, tag.length()));
+        int position = (int) changedView.getTag(R.id.tag_position);
         int count = 0;
         for (Map<Integer, String> map : dataList) {
-            if (map.get(1).equals(title))
+            if (Integer.parseInt(map.get(0)) == position)
                 return count;
             else
                 count++;
@@ -77,18 +76,14 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
         private TextView title;
         private ImageView hot_icon;
         private TextView hot_reply;
-        private TextView tag;
         private int position;
 
         public ViewHolder(LinearLayout layout) {
             super(layout);
 
-//            itemView.setTag("item-" + position);
-
             this.hot_icon = (ImageView) layout.findViewById(R.id.hot_icon);
             this.title = (TextView) layout.findViewById(R.id.title);
             this.hot_reply = (TextView) layout.findViewById(R.id.hot_reply);
-            this.tag = (TextView) layout.findViewById(R.id.tag);
         }
 
     }
@@ -107,9 +102,9 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
         holder.title.setText(map.get(1));
         holder.hot_icon.setImageResource(Integer.parseInt(map.get(2)));
         holder.hot_reply.setText(map.get(3));
-        holder.tag.setText("item-" + Integer.parseInt(map.get(0)));
 
-        holder.itemView.setTag("item");
+        holder.itemView.setTag(R.id.tag_type, "item");
+        holder.itemView.setTag(R.id.tag_position, holder.position);
     }
 
 }
