@@ -3,6 +3,12 @@ package pantsu.scrolldemo.scroll_5;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,17 +30,15 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
 
     private List<Map<Integer, String>> dataList;
 
-    private String[] title;
-    private int[] hot_icon;
-    private String[] hot_reply;
+    private Resources res;
 
     public SimpleAdapter(Context context) {
-        Resources res = context.getResources();
-        title = res.getStringArray(R.array.title);
-        hot_reply = res.getStringArray(R.array.hot_reply);
+        res = context.getResources();
+        String[] title = res.getStringArray(R.array.title);
+        String[] hot_reply = res.getStringArray(R.array.hot_reply);
 
         TypedArray typedArray = res.obtainTypedArray(R.array.hot_icon);
-        hot_icon = new int[title.length];
+        int[] hot_icon = new int[title.length];
         int titleLength = title.length;
         for (int index = 0; index < titleLength; index++) {
             hot_icon[index] = typedArray.getResourceId(index, 0);
@@ -100,11 +104,18 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
         Map<Integer, String> map = dataList.get(position);
         holder.position = Integer.parseInt(map.get(0));
         holder.title.setText(map.get(1));
-        holder.hot_icon.setImageResource(Integer.parseInt(map.get(2)));
+        holder.hot_icon.setImageDrawable(getRoundBitmap(Integer.parseInt(map.get(2))));
         holder.hot_reply.setText(map.get(3));
 
         holder.itemView.setTag(R.id.tag_type, "item");
         holder.itemView.setTag(R.id.tag_position, holder.position);
+    }
+
+    private Drawable getRoundBitmap(int imageId) {
+        Bitmap bitmap = BitmapFactory.decodeResource(res, imageId);
+        RoundedBitmapDrawable roundBitmapDrawable = RoundedBitmapDrawableFactory.create(res, bitmap);
+        roundBitmapDrawable.setCornerRadius(bitmap.getWidth()/2);
+        return roundBitmapDrawable;
     }
 
 }

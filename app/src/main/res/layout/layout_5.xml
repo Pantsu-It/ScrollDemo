@@ -7,7 +7,7 @@
     tools:context=".scroll_6.Activity_6">
 
     <pantsu.scrolldemo.scroll_5.MyRecyclerView
-        android:background="#ffaaaaaa"
+        android:background="#ffeaecf4"
         android:id="@+id/recycleView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

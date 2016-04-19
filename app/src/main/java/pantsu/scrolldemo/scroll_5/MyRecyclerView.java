@@ -70,6 +70,10 @@ public class MyRecyclerView extends RecyclerView {
                 if (Math.abs(minX - left) < 4) {
                     sListener.OnSlideOut(changedView);
 
+                    isScrolling = false;
+                    lastCapturedView = null;
+                } else if (Math.abs(maxX - left) < 4) {
+                    isScrolling = false;
                     lastCapturedView = null;
                 }
             }
@@ -116,7 +120,7 @@ public class MyRecyclerView extends RecyclerView {
     private float xDelta, yDelta, xDown, yDown;
     private boolean decideIntercept, intercepted;
     private int pointCount = 0;
-    private boolean  isScrolling = false;
+    private boolean isScrolling = false;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {

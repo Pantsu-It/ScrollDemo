@@ -35,6 +35,7 @@ public class Activity_5 extends Activity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(holderAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new SpaceItemDecoration(20));
         recyclerView.setHasFixedSize(true);
 
         recyclerView.setOnSlideOutListener(new MyRecyclerView.OnSlideOutListener() {
@@ -49,6 +50,7 @@ public class Activity_5 extends Activity {
                 }
             }
         });
+
 
     }
 }
