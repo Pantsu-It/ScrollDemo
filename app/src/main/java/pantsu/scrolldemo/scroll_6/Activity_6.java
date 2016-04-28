@@ -36,7 +36,7 @@ public class Activity_6 extends Activity implements View.OnTouchListener {
 
         setContentView(R.layout.layout_6);
 
-        convertActivityToTranslucent(this);
+//        convertActivityToTranslucent(this);
         configureLayout();
     }
 

@@ -9,9 +9,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
+
+import pantsu.scrolldemo.scroll_3.DragViewGroup;
 
 /**
  * Created by Pantsu on 2016/3/23.
@@ -31,11 +34,21 @@ public class DragBackGroup extends LinearLayout {
     public DragBackGroup(final Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        ViewTreeObserver observer = this.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void onGlobalLayout() {
+                DragBackGroup.this.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                findScrollView();
+            }
+        });
 
         mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
-                findScrollView();
+                // use ViewTreeObserver instead~
+//                findScrollView();
                 return child == scrollView;
             }
 

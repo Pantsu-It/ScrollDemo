@@ -70,15 +70,15 @@ public class DragViewGroup extends LinearLayout {
 
 
                 } else if (atExtactEdge(top) == STATUS_COLLAPSE) {
-                    View view =DragViewGroup.this.findViewById(R.id.list_pager);
+                    View view = DragViewGroup.this.findViewById(R.id.list_pager);
 
-                    if(status == STATUS_EXPEND) {
-                        MotionEvent up = Activity_3.getUpEvent(lastX, lastY);
-                        MotionEvent down = Activity_3.getDownEvent(lastX, lastY-480);
+                    if (status == STATUS_EXPEND) {
+                        MotionEvent up = Activity_3.getUpEvent(downEvent.getDownTime(), lastX, lastY);
+                        MotionEvent down = Activity_3.getDownEvent(lastX, lastY - 480);
                         DragViewGroup.this.dispatchTouchEvent(up);
                         DragViewGroup.this.dispatchTouchEvent(down);
-                    }else {
-                        MotionEvent up = Activity_3.getUpEvent(lastX, lastY);
+                    } else {
+                        MotionEvent up = Activity_3.getUpEvent(downEvent.getDownTime(), lastX, lastY);
                         MotionEvent down = Activity_3.getDownEvent(lastX, lastY);
                         DragViewGroup.this.dispatchTouchEvent(up);
                         DragViewGroup.this.dispatchTouchEvent(down);
@@ -156,9 +156,10 @@ public class DragViewGroup extends LinearLayout {
     }
 
     private float xDelta, yDelta, xDown, yDown;
-    private boolean decideIntercept, intercepted;
-
     private float lastX, lastY;
+
+    private boolean decideIntercept, intercepted;
+    private MotionEvent downEvent;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
@@ -174,6 +175,7 @@ public class DragViewGroup extends LinearLayout {
 
                 decideIntercept = false;
                 intercepted = false;
+                downEvent = event;
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (status == STATUS_SCROLL) {

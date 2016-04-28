@@ -9,7 +9,6 @@
 
     <style name="AppBaseTheme" parent="android:style/Theme.Translucent.NoTitleBar">
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:background">#33aaaaaa</item>
     </style>
 
 </resources>

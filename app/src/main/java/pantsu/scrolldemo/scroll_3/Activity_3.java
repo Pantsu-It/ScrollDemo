@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,6 +95,53 @@ public class Activity_3 extends Activity {
 
     private void initialView() {
         fade_group.setFadingRate(0);
+//        fade_group.setOnTouchListener(new View.OnTouchListener() {
+//
+//            float downX = 0, downY = 0, moveX = 0, moveY = 0;
+//            boolean decide = false, scroll = false;
+//            MotionEvent down;
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//
+//                float scrollY = height - h_setting - 300;
+//
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        downX = event.getX();
+//                        downY = event.getY();
+//                        decide = false;
+//                        scroll = false;
+//
+//
+//                        break;
+//                    case MotionEvent.ACTION_MOVE:
+//                        moveX = event.getX();
+//                        moveY = event.getY();
+//                        if (!decide) {
+//                            scroll = Math.abs(moveX - downX) > 3.0f * Math.abs(moveY - downY);
+//                            if (scroll) {
+//                                down = getDownEvent(downX, scrollY);
+//                                drag_group.dispatchTouchEvent(down);
+//                                Log.d("down", "" + downX);
+//                            }
+//                            decide = true;
+//                        }
+//                        if (scroll) {
+//                            MotionEvent move = getMoveEvent(down.getDownTime(), moveY, scrollY);
+//                            drag_group.dispatchTouchEvent(move);
+//                            Log.d("move", "" + moveX);
+//                        } else {
+//                            return false;
+//                        }
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                    case MotionEvent.ACTION_CANCEL:
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
 
         drag_group.setRange(0, 0, h_clock_collapse, h_clock);
         drag_group.setBackgroundColor(bgColors[0]);
@@ -133,12 +181,17 @@ public class Activity_3 extends Activity {
         });
     }
 
+
     public static MotionEvent getDownEvent(float x, float y) {
-        return MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, x, y, 0);
+        return MotionEvent.obtain(SystemClock.uptimeMillis()-100, SystemClock.uptimeMillis()-100, MotionEvent.ACTION_DOWN, x, y, 1);
     }
 
-    public static MotionEvent getUpEvent(float x, float y) {
-        return MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, x, y, 0);
+    public static MotionEvent getMoveEvent(long downTime, float x, float y) {
+        return MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE, x, y, 1);
+    }
+
+    public static MotionEvent getUpEvent(long downTime, float x, float y) {
+        return MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, x, y, 1);
     }
 
     private int currentPage = 0;
@@ -147,10 +200,6 @@ public class Activity_3 extends Activity {
     public boolean isOnTop() {
         int scrollY = scrollViews[currentPage].getScrollY();
         return scrollY < 10;
-    }
-
-    public void scrollToTop() {
-        scrollViews[currentPage].scrollTo(0, 0);
     }
 
     private class MyPagerAdapter extends PagerAdapter {

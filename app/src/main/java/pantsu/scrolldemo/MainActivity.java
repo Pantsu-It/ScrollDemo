@@ -1,11 +1,15 @@
 package pantsu.scrolldemo;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.Application;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -15,6 +19,7 @@ import pantsu.scrolldemo.scroll_2.Activity_2;
 import pantsu.scrolldemo.scroll_3.Activity_3;
 import pantsu.scrolldemo.scroll_5.Activity_5;
 import pantsu.scrolldemo.scroll_6.Activity_6;
+
 
 public class MainActivity extends AppCompatActivity {
 
