@@ -17,23 +17,16 @@ import android.widget.Scroller;
  */
 public class OverScrollView extends ScrollView {
 
-    View mChild;
-    Scroller scroller;
-    ScrollView scrollView;
+    private View mChild;
+    private Scroller scroller;
 
     public OverScrollView(Context context) {
         this(context, null);
     }
 
-    int status = STATUS_MIDDLE;
-    int markY;
-    int curY;
-
     public OverScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
         scroller = new Scroller(context);
-        scrollView = this;
-
 
         ViewTreeObserver observer = this.getViewTreeObserver();
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -45,15 +38,15 @@ public class OverScrollView extends ScrollView {
                     mChild = getChildAt(0);
             }
         });
-
-//        mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
-//            @Override
-//            public boolean tryCaptureView(View child, int pointerId) {
-//                return child == mChild;
-//            }
-//        });
-
     }
+
+    private static final int STATUS_TOP = 0;
+    private static final int STATUS_MIDDLE = 1;
+    private static final int STATUS_BOTTOM = 2;
+
+    private int status = STATUS_MIDDLE;
+    private int markY;
+    private int curY;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -64,11 +57,13 @@ public class OverScrollView extends ScrollView {
                 + "  markY:" + markY));
 
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            if (getScrollY() == 0) {
+            if (getScrollY() <= 0) {
                 // 顶部以上
                 if (status != STATUS_TOP) {
                     status = STATUS_TOP;
                     markY = curY;
+                } else if (curY < markY) {
+                    status = STATUS_MIDDLE;
                 } else {
                     mChild.scrollTo(0, markY - curY);
                 }
@@ -77,20 +72,20 @@ public class OverScrollView extends ScrollView {
                 if (status != STATUS_BOTTOM) {
                     status = STATUS_BOTTOM;
                     markY = curY;
+                } else if (curY > markY) {
+                    status = STATUS_MIDDLE;
                 } else {
                     mChild.scrollTo(0, markY - curY);
                 }
-            } else {
-//                if (status != STATUS_MIDDLE) {
-//                    status = STATUS_MIDDLE;
-//                    mChild.scrollTo(0, markY - curY);
-//                }
             }
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (status == STATUS_TOP)
+            Log.d("status", String.valueOf(status));
+            if (status == STATUS_TOP) {
                 scroller.startScroll(0, mChild.getScrollY(), 0, -mChild.getScrollY(), 500);
-            else if (status == STATUS_BOTTOM) {
+                scrollTo(0, 1);
+            } else if (status == STATUS_BOTTOM) {
                 scroller.startScroll(0, mChild.getScrollY(), 0, -mChild.getScrollY(), 500);
+                scrollTo(0, mChild.getHeight() - getHeight() - 1);
             }
             status = STATUS_MIDDLE;
         }
@@ -109,9 +104,4 @@ public class OverScrollView extends ScrollView {
             mChild.scrollTo(0, scroller.getCurrY());
         }
     }
-
-    public static final int STATUS_TOP = 0;
-    public static final int STATUS_MIDDLE = 1;
-    public static final int STATUS_BOTTOM = 2;
-
 }
