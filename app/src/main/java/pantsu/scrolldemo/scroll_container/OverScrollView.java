@@ -3,7 +3,6 @@ package pantsu.scrolldemo.scroll_container;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -50,10 +49,21 @@ public class OverScrollView extends ScrollView {
     private int lastY;
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+        }
+        return super.onInterceptTouchEvent(event);
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         lastY = curY;
         curY = (int) event.getY();
-        switch (event.getAction()){
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d("喵喵喵", "aaaaaaaaaaaaaa");
+                break;
             case MotionEvent.ACTION_MOVE:
                 if (getScrollY() <= 0) {
                     // 顶部以上
