@@ -19,6 +19,7 @@ import pantsu.scrolldemo.scroll_2.Activity_2;
 import pantsu.scrolldemo.scroll_3.Activity_3;
 import pantsu.scrolldemo.scroll_5.Activity_5;
 import pantsu.scrolldemo.scroll_6.Activity_6;
+import pantsu.scrolldemo.scroll_7.Activity_7;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -79,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btn6:
                 intent = new Intent(MainActivity.this, Activity_6.class);
+                break;
+            case R.id.btn7:
+                intent = new Intent(MainActivity.this, Activity_7.class);
                 break;
         }
         startActivity(intent);
