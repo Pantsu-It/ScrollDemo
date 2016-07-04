@@ -30,10 +30,12 @@ public class Activity_7 extends Activity {
 
 
         LinearLayout layout = new LinearLayout(this);
+        layout.setGravity(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 50);
-        for (int i = 1; i <= 12; i++) {
+                LinearLayout.LayoutParams.MATCH_PARENT, 100);
+        for (int i = 1; i <= 20; i++) {
             Button btn = new Button(this);
+            btn.setText("我是Button-" + i);
             layout.addView(btn, params);
         }
 
@@ -41,7 +43,7 @@ public class Activity_7 extends Activity {
         ScrollView.LayoutParams params1 = new ScrollView.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
         overScrollView.setBackgroundColor(0xff445566);
-        overScrollView.addView(layout);
+        overScrollView.addView(layout, params1);
         setContentView(overScrollView);
     }
 

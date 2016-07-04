@@ -36,6 +36,9 @@
             android:theme="@style/AppBaseTheme">
             <!--android:theme="@android:style/Theme.Translucent.NoTitleBar"-->
         </activity>
+        <activity
+            android:name=".scroll_7.Activity_7"
+            android:theme="@style/AppBaseTheme"></activity>
     </application>
 
 </manifest>

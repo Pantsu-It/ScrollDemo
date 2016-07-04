@@ -5,9 +5,8 @@ import android.content.Context;
 import android.os.Build;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroupOverlay;
 import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
 
@@ -16,12 +15,12 @@ import android.widget.ScrollView;
  */
 public class OverScrollView extends ScrollView {
 
-    View child;
+    View mChild;
 
     ViewDragHelper dragHelper = ViewDragHelper.create(this, new ViewDragHelper.Callback() {
         @Override
         public boolean tryCaptureView(View child, int pointerId) {
-            return false;
+            return child == mChild;
         }
     });
 
@@ -40,8 +39,13 @@ public class OverScrollView extends ScrollView {
             public void onGlobalLayout() {
 //                getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 if (getChildCount() != 0)
-                    child = getChildAt(0);
+                    mChild = getChildAt(0);
             }
         });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        return super.onTouchEvent(ev);
     }
 }
