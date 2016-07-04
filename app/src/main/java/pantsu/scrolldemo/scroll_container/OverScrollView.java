@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -16,13 +17,7 @@ import android.widget.ScrollView;
 public class OverScrollView extends ScrollView {
 
     View mChild;
-
-    ViewDragHelper dragHelper = ViewDragHelper.create(this, new ViewDragHelper.Callback() {
-        @Override
-        public boolean tryCaptureView(View child, int pointerId) {
-            return child == mChild;
-        }
-    });
+    ViewDragHelper mDragHelper;
 
 
     public OverScrollView(Context context) {
@@ -42,10 +37,28 @@ public class OverScrollView extends ScrollView {
                     mChild = getChildAt(0);
             }
         });
+
+//        mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
+//            @Override
+//            public boolean tryCaptureView(View child, int pointerId) {
+//                return child == mChild;
+//            }
+//        });
+
+        setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d("tag", "scrolleY:" + getScrollY()
+                        + "  height-child.height:" + (getHeight() - mChild.getHeight()));
+                return false;
+            }
+        });
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        return super.onTouchEvent(ev);
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        mDragHelper.processTouchEvent(event);
+//        return true;
+////        return super.onTouchEvent(event);
+//    }
 }
