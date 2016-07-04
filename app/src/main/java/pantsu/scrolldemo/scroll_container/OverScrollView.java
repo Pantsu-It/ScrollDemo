@@ -47,47 +47,49 @@ public class OverScrollView extends ScrollView {
     private int status = STATUS_MIDDLE;
     private int markY;
     private int curY;
+    private int lastY;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        lastY = curY;
         curY = (int) event.getY();
-        Log.d("tag", "scrolleY:" + getScrollY()
-                + "  child.height-height:" + (mChild.getHeight() - getHeight()
-                + "  curY:" + curY
-                + "  markY:" + markY));
-
-        if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            if (getScrollY() <= 0) {
-                // 顶部以上
-                if (status != STATUS_TOP) {
-                    status = STATUS_TOP;
-                    markY = curY;
-                } else if (curY < markY) {
-                    status = STATUS_MIDDLE;
-                } else {
-                    mChild.scrollTo(0, markY - curY);
+        switch (event.getAction()){
+            case MotionEvent.ACTION_MOVE:
+                if (getScrollY() <= 0) {
+                    // 顶部以上
+                    if (status != STATUS_TOP) {
+                        status = STATUS_TOP;
+                        markY = curY;
+                    } else if (curY < markY) {
+                        status = STATUS_MIDDLE;
+                    } else {
+                        mChild.scrollBy(0, lastY - curY);
+//                    mChild.scrollTo(0, markY - curY);
+                    }
+                } else if (getScrollY() == mChild.getHeight() - getHeight()) {
+                    // 底部以下
+                    if (status != STATUS_BOTTOM) {
+                        status = STATUS_BOTTOM;
+                        markY = curY;
+                    } else if (curY > markY) {
+                        status = STATUS_MIDDLE;
+                    } else {
+                        mChild.scrollBy(0, lastY - curY);
+//                    mChild.scrollTo(0, markY - curY);
+                    }
                 }
-            } else if (getScrollY() == mChild.getHeight() - getHeight()) {
-                // 底部以下
-                if (status != STATUS_BOTTOM) {
-                    status = STATUS_BOTTOM;
-                    markY = curY;
-                } else if (curY > markY) {
-                    status = STATUS_MIDDLE;
-                } else {
-                    mChild.scrollTo(0, markY - curY);
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if (status == STATUS_TOP) {
+                    scroller.startScroll(0, mChild.getScrollY(), 0, -mChild.getScrollY(), 500);
+                    scrollTo(0, 1);
+                } else if (status == STATUS_BOTTOM) {
+                    scroller.startScroll(0, mChild.getScrollY(), 0, -mChild.getScrollY(), 500);
+                    scrollTo(0, mChild.getHeight() - getHeight() - 1);
                 }
-            }
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            Log.d("status", String.valueOf(status));
-            if (status == STATUS_TOP) {
-                scroller.startScroll(0, mChild.getScrollY(), 0, -mChild.getScrollY(), 500);
-                scrollTo(0, 1);
-            } else if (status == STATUS_BOTTOM) {
-                scroller.startScroll(0, mChild.getScrollY(), 0, -mChild.getScrollY(), 500);
-                scrollTo(0, mChild.getHeight() - getHeight() - 1);
-            }
-            status = STATUS_MIDDLE;
+                status = STATUS_MIDDLE;
+                break;
         }
 
         if (status == STATUS_MIDDLE)
