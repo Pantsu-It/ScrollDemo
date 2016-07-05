@@ -52,7 +52,7 @@ public class OverScrollView extends ScrollView {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
+            // scroller 及时停止
         }
         return super.onInterceptTouchEvent(event);
     }
