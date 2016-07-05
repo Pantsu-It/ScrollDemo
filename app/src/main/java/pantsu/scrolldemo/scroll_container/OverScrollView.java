@@ -47,6 +47,7 @@ public class OverScrollView extends ScrollView {
     private int markY;
     private int curY;
     private int lastY;
+    private float scrollRate = 0.5f;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
@@ -73,8 +74,7 @@ public class OverScrollView extends ScrollView {
                     } else if (curY < markY) {
                         status = STATUS_MIDDLE;
                     } else {
-                        mChild.scrollBy(0, lastY - curY);
-//                    mChild.scrollTo(0, markY - curY);
+                        mChild.scrollBy(0, (int) ((lastY - curY) * scrollRate));
                     }
                 } else if (getScrollY() == mChild.getHeight() - getHeight()) {
                     // 底部以下
@@ -84,8 +84,7 @@ public class OverScrollView extends ScrollView {
                     } else if (curY > markY) {
                         status = STATUS_MIDDLE;
                     } else {
-                        mChild.scrollBy(0, lastY - curY);
-//                    mChild.scrollTo(0, markY - curY);
+                        mChild.scrollBy(0, (int) ((lastY - curY) * scrollRate));
                     }
                 }
                 break;
