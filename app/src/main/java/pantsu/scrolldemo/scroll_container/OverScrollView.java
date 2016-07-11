@@ -121,7 +121,7 @@ public class OverScrollView extends ScrollView {
         }
     }
 
-    public abstract class OverScrollStrategy {
+    public static abstract class OverScrollStrategy {
 
         public int onScrollTop(int y, int dy) {
             return 0;
