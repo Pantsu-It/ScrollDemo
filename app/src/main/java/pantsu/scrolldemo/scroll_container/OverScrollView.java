@@ -1,8 +1,6 @@
 package pantsu.scrolldemo.scroll_container;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -18,6 +16,7 @@ public class OverScrollView extends ScrollView {
 
     private View mChild;
     private Scroller scroller;
+    private OverScrollStrategy mScrollStrategy;
 
     public OverScrollView(Context context) {
         this(context, null);
@@ -29,14 +28,16 @@ public class OverScrollView extends ScrollView {
 
         ViewTreeObserver observer = this.getViewTreeObserver();
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onGlobalLayout() {
-//                getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 if (getChildCount() != 0)
                     mChild = getChildAt(0);
             }
         });
+    }
+
+    public void setScrollStrategy(OverScrollStrategy scrollStrategy) {
+        mScrollStrategy = scrollStrategy;
     }
 
     private static final int STATUS_TOP = 0;
@@ -44,62 +45,73 @@ public class OverScrollView extends ScrollView {
     private static final int STATUS_BOTTOM = 2;
 
     private int status = STATUS_MIDDLE;
-    private int markY;
     private int curY;
-    private int lastY;
-    private float scrollRate = 0.5f;
+    private int lastY = -1;
+    private int position;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            // 功能：scroller 及时停止~
-            // Idea: 新建内部容器类，利用解决“滑动冲突”方法重写内部类滑动事件...
+            // 补充功能：scroller 及时停止~
+            // 其他实现: 新建内部容器类，利用解决“滑动冲突”方法重写内部类滑动事件...
+            position = 0;
+            curY = (int) event.getY();
         }
         return super.onInterceptTouchEvent(event);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        lastY = curY;
-        curY = (int) event.getY();
+        String a = status == 0 ? "top" : status == 1 ? "middle" : "bottom";
+        Log.d("state", "state:" + a + " position:" + position);
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                Log.d("喵喵喵", "aaaaaaaaaaaaaa");
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (getScrollY() <= 0) {
+            case MotionEvent.ACTION_MOVE: {
+                lastY = curY;
+                curY = (int) event.getY();
+
+                if (getScrollY() == 0) {
                     // 顶部以上
                     if (status != STATUS_TOP) {
                         status = STATUS_TOP;
-                        markY = curY;
-                    } else if (curY < markY) {
+                        position = 0;
+                    }
+
+                    int dy = curY - lastY;
+                    if (position + dy <= 0) {
                         status = STATUS_MIDDLE;
+                        position = mScrollStrategy.onScrollTop(0, 0 - position);
                     } else {
-                        mChild.scrollBy(0, (int) ((lastY - curY) * scrollRate));
+                        position = mScrollStrategy.onScrollTop(position + dy, dy);
                     }
                 } else if (getScrollY() == mChild.getHeight() - getHeight()) {
                     // 底部以下
                     if (status != STATUS_BOTTOM) {
                         status = STATUS_BOTTOM;
-                        markY = curY;
-                    } else if (curY > markY) {
+                        position = 0;
+                    }
+
+                    int dy = lastY - curY;
+                    if (position <= 0) {
                         status = STATUS_MIDDLE;
+                        position = mScrollStrategy.onScrollTop(0, 0 - position);
                     } else {
-                        mChild.scrollBy(0, (int) ((lastY - curY) * scrollRate));
+                        position = mScrollStrategy.onScrollBottom(position + dy, dy);
                     }
                 }
                 break;
+            }
             case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_CANCEL: {
                 if (status == STATUS_TOP) {
-                    scroller.startScroll(0, mChild.getScrollY(), 0, -mChild.getScrollY(), 500);
-                    scrollTo(0, 1);
+                    mScrollStrategy.onReleaseTop(position);
+//                    scrollTo(0, 1);
                 } else if (status == STATUS_BOTTOM) {
-                    scroller.startScroll(0, mChild.getScrollY(), 0, -mChild.getScrollY(), 500);
-                    scrollTo(0, mChild.getHeight() - getHeight() - 1);
+                    mScrollStrategy.onReleaseBottom(position);
+//                    scrollTo(0, mChild.getHeight() - getHeight() - 1);
                 }
                 status = STATUS_MIDDLE;
                 break;
+            }
         }
 
         if (status == STATUS_MIDDLE)
@@ -108,12 +120,14 @@ public class OverScrollView extends ScrollView {
             return true;
     }
 
-    @Override
-    public void computeScroll() {
-        super.computeScroll();
+    public interface OverScrollStrategy {
 
-        if (scroller.computeScrollOffset()) {
-            mChild.scrollTo(0, scroller.getCurrY());
-        }
+        int onScrollTop(int y, int dy);
+
+        int onScrollBottom(int y, int dy);
+
+        void onReleaseTop(int y);
+
+        void onReleaseBottom(int y);
     }
 }
