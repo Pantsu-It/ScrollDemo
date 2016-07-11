@@ -15,8 +15,9 @@ import android.widget.Scroller;
 public class OverScrollView extends ScrollView {
 
     private View mChild;
-    private Scroller scroller;
-    private OverScrollStrategy mScrollStrategy;
+    private OverScrollStrategy mScrollStrategy = new OverScrollStrategy() {
+        // Empty realization~
+    };
 
     public OverScrollView(Context context) {
         this(context, null);
@@ -24,7 +25,6 @@ public class OverScrollView extends ScrollView {
 
     public OverScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        scroller = new Scroller(context);
 
         ViewTreeObserver observer = this.getViewTreeObserver();
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -37,7 +37,9 @@ public class OverScrollView extends ScrollView {
     }
 
     public void setScrollStrategy(OverScrollStrategy scrollStrategy) {
-        mScrollStrategy = scrollStrategy;
+        if (scrollStrategy != null) {
+            mScrollStrategy = scrollStrategy;
+        }
     }
 
     private static final int STATUS_TOP = 0;
@@ -46,7 +48,7 @@ public class OverScrollView extends ScrollView {
 
     private int status = STATUS_MIDDLE;
     private int curY;
-    private int lastY = -1;
+    private int lastY;
     private int position;
 
     @Override
@@ -70,7 +72,7 @@ public class OverScrollView extends ScrollView {
                 curY = (int) event.getY();
 
                 if (getScrollY() == 0) {
-                    // 顶部以上
+                    // 顶部拉伸
                     if (status != STATUS_TOP) {
                         status = STATUS_TOP;
                         position = 0;
@@ -84,7 +86,7 @@ public class OverScrollView extends ScrollView {
                         position = mScrollStrategy.onScrollTop(position + dy, dy);
                     }
                 } else if (getScrollY() == mChild.getHeight() - getHeight()) {
-                    // 底部以下
+                    // 底部拉伸
                     if (status != STATUS_BOTTOM) {
                         status = STATUS_BOTTOM;
                         position = 0;
@@ -104,30 +106,35 @@ public class OverScrollView extends ScrollView {
             case MotionEvent.ACTION_CANCEL: {
                 if (status == STATUS_TOP) {
                     mScrollStrategy.onReleaseTop(position);
-//                    scrollTo(0, 1);
                 } else if (status == STATUS_BOTTOM) {
                     mScrollStrategy.onReleaseBottom(position);
-//                    scrollTo(0, mChild.getHeight() - getHeight() - 1);
                 }
                 status = STATUS_MIDDLE;
                 break;
             }
         }
 
-        if (status == STATUS_MIDDLE)
+        if (status == STATUS_MIDDLE) {
             return super.onTouchEvent(event);
-        else
+        } else {
             return true;
+        }
     }
 
-    public interface OverScrollStrategy {
+    public abstract class OverScrollStrategy {
 
-        int onScrollTop(int y, int dy);
+        public int onScrollTop(int y, int dy) {
+            return 0;
+        }
 
-        int onScrollBottom(int y, int dy);
+        public int onScrollBottom(int y, int dy) {
+            return 0;
+        }
 
-        void onReleaseTop(int y);
+        public void onReleaseTop(int y) {
+        }
 
-        void onReleaseBottom(int y);
+        public void onReleaseBottom(int y) {
+        }
     }
 }
