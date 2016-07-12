@@ -7,7 +7,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
-import android.widget.Scroller;
 
 /**
  * Created by Pants on 2016/7/4.
@@ -15,6 +14,7 @@ import android.widget.Scroller;
 public class OverScrollView extends ScrollView {
 
     private View mChild;
+    private OnScrollChangeListener onScrollChangeListener;
     private OverScrollStrategy mScrollStrategy = new OverScrollStrategy() {
         // Empty realization~
     };
@@ -34,6 +34,10 @@ public class OverScrollView extends ScrollView {
                     mChild = getChildAt(0);
             }
         });
+    }
+
+    public void setOnScrollChangeListener(OnScrollChangeListener onScrollChangeListener) {
+        this.onScrollChangeListener = onScrollChangeListener;
     }
 
     public void setScrollStrategy(OverScrollStrategy scrollStrategy) {
@@ -81,9 +85,9 @@ public class OverScrollView extends ScrollView {
                     int dy = curY - lastY;
                     if (position + dy <= 0) {
                         status = STATUS_MIDDLE;
-                        position = mScrollStrategy.onScrollTop(0, 0 - position);
+                        position = mScrollStrategy.onOverScrollTop(0, 0 - position);
                     } else {
-                        position = mScrollStrategy.onScrollTop(position + dy, dy);
+                        position = mScrollStrategy.onOverScrollTop(position + dy, dy);
                     }
                 } else if (getScrollY() == mChild.getHeight() - getHeight()) {
                     // 底部拉伸
@@ -95,9 +99,9 @@ public class OverScrollView extends ScrollView {
                     int dy = lastY - curY;
                     if (position <= 0) {
                         status = STATUS_MIDDLE;
-                        position = mScrollStrategy.onScrollTop(0, 0 - position);
+                        position = mScrollStrategy.onOverScrollBottom(0, 0 - position);
                     } else {
-                        position = mScrollStrategy.onScrollBottom(position + dy, dy);
+                        position = mScrollStrategy.onOverScrollBottom(position + dy, dy);
                     }
                 }
                 break;
@@ -121,13 +125,24 @@ public class OverScrollView extends ScrollView {
         }
     }
 
+    @Override
+    protected void onScrollChanged(int scrollX, int scrollY, int oldX, int oldY) {
+        super.onScrollChanged(scrollX, scrollY, oldX, oldY);
+
+        onScrollChangeListener.onScrollChanged(scrollX, scrollY, oldX, oldY);
+    }
+
+    public interface OnScrollChangeListener {
+        void onScrollChanged(int scrollX, int scrollY, int oldX, int oldY);
+    }
+
     public static abstract class OverScrollStrategy {
 
-        public int onScrollTop(int y, int dy) {
+        public int onOverScrollTop(int y, int dy) {
             return 0;
         }
 
-        public int onScrollBottom(int y, int dy) {
+        public int onOverScrollBottom(int y, int dy) {
             return 0;
         }
 
