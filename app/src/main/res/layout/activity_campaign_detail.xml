@@ -165,23 +165,36 @@
                     android:id="@+id/btnPrevious"
                     android:layout_width="50dp"
                     android:layout_height="match_parent"
-                    android:layout_alignParentLeft="true"
-                    android:background="@drawable/back_btn_bg"
+                    android:background="@drawable/btn_previous_bg"
                     android:clickable="true"
                     android:onClick="onClick"
                     android:padding="12dp"
-                    android:src="@drawable/back_btn_img_white" />
+                    android:src="@drawable/btn_previous_white" />
 
                 <TextView
                     android:id="@+id/tvCampaignName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
+                    android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:maxWidth="240dp"
                     android:textColor="#ffffff"
                     android:textSize="@dimen/text_size_larger" />
+
+                <ImageView
+                    android:id="@+id/btnSetting"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="12dp"
+                    android:background="@drawable/btn_previous_bg"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:padding="12dp"
+                    android:src="@drawable/btn_menu" />
+
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

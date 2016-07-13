@@ -16,18 +16,16 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import pantsu.scrolldemo.R;
-import pantsu.scrolldemo.scroll_7_parts.CampaignInfo;
 import pantsu.scrolldemo.scroll_7_parts.ImageLoader;
-import pantsu.scrolldemo.scroll_container.OverScrollView;
 import pantsu.scrolldemo.scroll_7_parts.ImageUtil;
 import pantsu.scrolldemo.scroll_7_parts.SystemBarTintManager;
+import pantsu.scrolldemo.scroll_container.OverScrollView;
 
 /**
  * Created by Pants on 2016/7/5.
@@ -38,6 +36,7 @@ public class Activity_7 extends Activity {
     private LinearLayout imageScrollView;
     private RelativeLayout.LayoutParams scrollLayoutParams;
 
+    OverScrollView.OverScrollStrategy scrollStrategy1, scrollStrategy2, scrollStrategy3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,22 +49,12 @@ public class Activity_7 extends Activity {
 
         ((TextView) findViewById(R.id.tvCampaignName)).setText("活动名称");
         ((TextView) findViewById(R.id.tvCampaignTime))
-                .setText(getInterval("20160713101010", "20160729101010"));
+                .setText(getInterval("2016-07-13 10:10:10", "2016-07-29 10:10:10"));
         ((TextView) findViewById(R.id.tvCampaignDetail)).setText("活动详情"
-                +"\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>" +
-                "\n" +
-                "<br/>\n" +
-                "<br/> \n" +
-                "<br/>\n" +
-                "<br/>\n" +
-                "<br/>\n" +
-                "<br/>\n" +
-                "<br/>\n" +
-                "<br/>\n" +
-                "<br/>\n" +
-                "<br/>");
+                + "\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>"
+                + "\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>\n<br/>");
         ImageLoader.getInstance(this).bindBitmap("",
-                R.drawable.default_user_icon, (ImageView) findViewById(R.id.ivCampaignImage),new ImageLoader.BindStrategy() {
+                R.drawable.default_user_icon, (ImageView) findViewById(R.id.ivCampaignImage), new ImageLoader.BindStrategy() {
                     @Override
                     public void bindBitmapToTarget(ImageView imageView, Bitmap bitmap) {
                         imageView.setImageBitmap(bitmap);
@@ -98,7 +87,8 @@ public class Activity_7 extends Activity {
                     }
                 });
         overScrollView = (OverScrollView) findViewById(R.id.overScrollView);
-        overScrollView.setScrollStrategy(new OverScrollView.OverScrollStrategy() {
+
+        scrollStrategy1 = new OverScrollView.OverScrollStrategy() {
             @Override
             public int onOverScrollTop(int y, int dy) {
                 int scrollY = Math.min(y, imageHeight - imageScrollHeight);
@@ -123,7 +113,60 @@ public class Activity_7 extends Activity {
                 animator.setDuration(150);
                 animator.start();
             }
-        });
+        };
+        scrollStrategy2 = new OverScrollView.OverScrollStrategy() {
+            @Override
+            public int onOverScrollTop(int y, int dy) {
+                int scrollY = Math.min(y, imageHeight - imageScrollHeight);
+                imageScrollView.scrollTo(0, (imageHeight - imageScrollHeight - scrollY) / 2);
+                scrollLayoutParams.height = imageScrollHeight + scrollY;
+                imageScrollView.requestLayout();
+                return scrollY;
+            }
+
+            @Override
+            public void onReleaseTop(int y) {
+                ValueAnimator animator = ValueAnimator.ofInt(y, 0);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int scrollY = (int) animation.getAnimatedValue();
+                        imageScrollView.scrollTo(0, (imageHeight - imageScrollHeight - scrollY) / 2);
+                        scrollLayoutParams.height = imageScrollHeight + scrollY;
+                        imageScrollView.requestLayout();
+                    }
+                });
+                animator.setDuration(150);
+                animator.start();
+            }
+        };
+        scrollStrategy3 = new OverScrollView.OverScrollStrategy() {
+            @Override
+            public int onOverScrollTop(int y, int dy) {
+                int scrollY = Math.min(y, imageHeight - imageScrollHeight);
+                imageScrollView.scrollTo(0, (imageHeight - imageScrollHeight - scrollY) / 2);
+                scrollLayoutParams.height = imageScrollHeight + scrollY;
+                imageScrollView.requestLayout();
+                return scrollY;
+            }
+
+            @Override
+            public void onReleaseTop(int y) {
+                ValueAnimator animator = ValueAnimator.ofInt(y, 0);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int scrollY = (int) animation.getAnimatedValue();
+                        imageScrollView.scrollTo(0, (imageHeight - imageScrollHeight - scrollY) / 2);
+                        scrollLayoutParams.height = imageScrollHeight + scrollY;
+                        imageScrollView.requestLayout();
+                    }
+                });
+                animator.setDuration(150);
+                animator.start();
+            }
+        };
+        overScrollView.setScrollStrategy(scrollStrategy1);
         overScrollView.setOnScrollChangeListener(new OverScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChanged(int scrollX, int scrollY, int oldX, int oldY) {
