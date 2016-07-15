@@ -7,19 +7,33 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListPopupWindow;
+import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import pantsu.scrolldemo.R;
 import pantsu.scrolldemo.scroll_7_parts.ImageLoader;
@@ -117,10 +131,8 @@ public class Activity_7 extends Activity {
         scrollStrategy2 = new OverScrollView.OverScrollStrategy() {
             @Override
             public int onOverScrollTop(int y, int dy) {
-                int scrollY = Math.min(y, imageHeight - imageScrollHeight);
-                imageScrollView.scrollTo(0, (imageHeight - imageScrollHeight - scrollY) / 2);
-                scrollLayoutParams.height = imageScrollHeight + scrollY;
-                imageScrollView.requestLayout();
+                int scrollY = Math.min(y, 200);
+                overScrollView.getChildAt(0).scrollTo(0, -scrollY);
                 return scrollY;
             }
 
@@ -131,9 +143,7 @@ public class Activity_7 extends Activity {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
                         int scrollY = (int) animation.getAnimatedValue();
-                        imageScrollView.scrollTo(0, (imageHeight - imageScrollHeight - scrollY) / 2);
-                        scrollLayoutParams.height = imageScrollHeight + scrollY;
-                        imageScrollView.requestLayout();
+                        overScrollView.getChildAt(0).scrollTo(0, -scrollY);
                     }
                 });
                 animator.setDuration(150);
@@ -143,10 +153,12 @@ public class Activity_7 extends Activity {
         scrollStrategy3 = new OverScrollView.OverScrollStrategy() {
             @Override
             public int onOverScrollTop(int y, int dy) {
-                int scrollY = Math.min(y, imageHeight - imageScrollHeight);
-                imageScrollView.scrollTo(0, (imageHeight - imageScrollHeight - scrollY) / 2);
-                scrollLayoutParams.height = imageScrollHeight + scrollY;
-                imageScrollView.requestLayout();
+                int scrollY = Math.min(y, 500);
+                float scaleY = 0.25f * scrollY / 500  + 1;
+                View view = overScrollView.getChildAt(0);
+                view.setPivotY(0);
+                view.setScaleY(scaleY);
+                view.invalidate();
                 return scrollY;
             }
 
@@ -157,9 +169,11 @@ public class Activity_7 extends Activity {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
                         int scrollY = (int) animation.getAnimatedValue();
-                        imageScrollView.scrollTo(0, (imageHeight - imageScrollHeight - scrollY) / 2);
-                        scrollLayoutParams.height = imageScrollHeight + scrollY;
-                        imageScrollView.requestLayout();
+                        float scaleY = 0.25f * scrollY / 500  + 1;
+                        View view = overScrollView.getChildAt(0);
+                        view.setPivotY(0);
+                        view.setScaleY(scaleY);
+                        view.invalidate();
                     }
                 });
                 animator.setDuration(150);
@@ -244,6 +258,35 @@ public class Activity_7 extends Activity {
         int viewId = view.getId();
         if (viewId == R.id.btnPrevious) {
             finish();
+        } else if (viewId == R.id.btnSetting) {
+            List<String> list = new ArrayList<>();
+            list.add("自定义模式");
+            list.add("Over-Scroll");
+            list.add("Over-Stretch");
+
+            final ListPopupWindow popupWindow = new ListPopupWindow(this);
+            popupWindow.setAdapter(new ArrayAdapter(this, android.R.layout.simple_list_item_1, list));
+            popupWindow.setWidth(400);
+            popupWindow.setHeight(RelativeLayout.LayoutParams.WRAP_CONTENT);
+            popupWindow.setAnchorView(view);
+            popupWindow.setModal(true);
+            popupWindow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    switch (position) {
+                        case 0:
+                            overScrollView.setScrollStrategy(scrollStrategy1);
+                            break;
+                        case 1:
+                            overScrollView.setScrollStrategy(scrollStrategy2);
+                            break;
+                        case 2:
+                            overScrollView.setScrollStrategy(scrollStrategy3);
+                            break;
+                    }
+                }
+            });
+            popupWindow.show();
         }
     }
 
