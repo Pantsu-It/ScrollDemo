@@ -13,6 +13,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
+import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -154,7 +155,7 @@ public class Activity_7 extends Activity {
             @Override
             public int onOverScrollTop(int y, int dy) {
                 int scrollY = Math.min(y, 500);
-                float scaleY = 0.25f * scrollY / 500  + 1;
+                float scaleY = 0.15f * scrollY / 500  + 1;
                 View view = overScrollView.getChildAt(0);
                 view.setPivotY(0);
                 view.setScaleY(scaleY);
@@ -165,11 +166,12 @@ public class Activity_7 extends Activity {
             @Override
             public void onReleaseTop(int y) {
                 ValueAnimator animator = ValueAnimator.ofInt(y, 0);
+                animator.setInterpolator(new OvershootInterpolator());
                 animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
                         int scrollY = (int) animation.getAnimatedValue();
-                        float scaleY = 0.25f * scrollY / 500  + 1;
+                        float scaleY = 0.15f * scrollY / 500  + 1;
                         View view = overScrollView.getChildAt(0);
                         view.setPivotY(0);
                         view.setScaleY(scaleY);
@@ -284,6 +286,7 @@ public class Activity_7 extends Activity {
                             overScrollView.setScrollStrategy(scrollStrategy3);
                             break;
                     }
+                    popupWindow.dismiss();
                 }
             });
             popupWindow.show();
