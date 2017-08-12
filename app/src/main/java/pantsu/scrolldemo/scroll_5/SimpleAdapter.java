@@ -37,15 +37,14 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
         String[] title = res.getStringArray(R.array.title);
         String[] hot_reply = res.getStringArray(R.array.hot_reply);
 
-        TypedArray typedArray = res.obtainTypedArray(R.array.hot_icon);
         int[] hot_icon = new int[title.length];
-        int titleLength = title.length;
-        for (int index = 0; index < titleLength; index++) {
+        TypedArray typedArray = res.obtainTypedArray(R.array.hot_icon);
+        for (int index = 0; index < hot_icon.length; index++) {
             hot_icon[index] = typedArray.getResourceId(index, 0);
         }
 
         dataList = new ArrayList<>();
-        for (int i = 0; i < titleLength; i++) {
+        for (int i = 0; i < title.length; i++) {
             Map<Integer, String> map = new HashMap<>();
             map.put(0, String.valueOf(i));
             map.put(1, title[i]);
