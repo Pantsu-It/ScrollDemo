@@ -125,7 +125,6 @@
 
                 <pantsu.scrolldemo.scroll_2.DragViewGroup
                     android:id="@+id/dragGroup"
-                    android:background="#25e78e"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
 
@@ -143,5 +142,6 @@
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:scaleType="fitXY"
         android:src="@drawable/a_bottom"/>
 </LinearLayout>
