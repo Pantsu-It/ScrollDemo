@@ -7,14 +7,13 @@ import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import java.lang.reflect.Field;
 
-import pantsu.scrolldemo.MainActivity;
 import pantsu.scrolldemo.R;
 
 /**
@@ -31,7 +30,9 @@ public class DragViewGroup_Slide extends LinearLayout {
     private static final Interpolator sInterpolator = new DecelerateInterpolator(1.5f);
     private ScrollerCompat scrollerCompat;
 
-    public boolean condition = false;
+    public static final int CONDITION_WRAP_IN = 0;
+    public static final int CONDITION_SHOW_OUT = 1;
+    public int condition = CONDITION_WRAP_IN;
 
     public DragViewGroup_Slide(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -72,21 +73,21 @@ public class DragViewGroup_Slide extends LinearLayout {
 
                 float y = releasedChild.getY();
                 if (y == maxY) {
-                    condition = true;
+                    condition = DragViewGroup_Slide.CONDITION_SHOW_OUT;
                 } else if (y == minY) {
-                    condition = false;
+                    condition = CONDITION_WRAP_IN;
                 } else if (yvel > 1000) {
                     slideOut();
-                    condition = true;
+                    condition = DragViewGroup_Slide.CONDITION_SHOW_OUT;
                 } else if (yvel < -1000) {
                     slideIn();
-                    condition = false;
+                    condition = CONDITION_WRAP_IN;
                 } else if (y > (maxY + minY) / 2) {
                     slideOut();
-                    condition = true;
+                    condition = DragViewGroup_Slide.CONDITION_SHOW_OUT;
                 } else {
                     slideIn();
-                    condition = false;
+                    condition = CONDITION_WRAP_IN;
                 }
 
                 if (mListener != null) {
@@ -97,7 +98,6 @@ public class DragViewGroup_Slide extends LinearLayout {
 
         setInterpolator(context, mDragHelper, sInterpolator);
     }
-
 
     private void setInterpolator(Context context, ViewDragHelper helper, Interpolator sInterpolator) {
         scrollerCompat = ScrollerCompat.create(context, sInterpolator);
@@ -140,10 +140,9 @@ public class DragViewGroup_Slide extends LinearLayout {
         }
     }
 
-
-    private float xDelta, yDelta, xLast, yLast;
+    private float xDelta, yDelta, xDown, yDown;
     private boolean decideIntercept;
-    private int mode;
+    private int fetchMode;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
@@ -152,39 +151,53 @@ public class DragViewGroup_Slide extends LinearLayout {
             case MotionEvent.ACTION_DOWN:
                 mDragHelper.processTouchEvent(event);
                 xDelta = yDelta = 0f;
-                xLast = event.getX();
-                yLast = event.getY();
+                xDown = event.getX();
+                yDown = event.getY();
 
                 decideIntercept = false;
-                mode = -1;
+                fetchMode = -1;
 
                 if (isSliding()) {
                     intercepted = true;
                     break;
                 }
 
-                if (inRangeOfView(findViewById(R.id.container_top), event))
-                    mode = 0;
-                else if (inRangeOfView(findViewById(R.id.container_center), event))
-                    mode = 1;
+                if (inRangeOfView(findViewById(R.id.container_top), event)) {
+                    fetchMode = 0;
+                } else if (inRangeOfView(findViewById(R.id.container_center), event)
+                        && isScrollAtBottom((ViewGroup) findViewById(R.id.scroll_left))) {
+                    fetchMode = 1;
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (mode != -1 && !decideIntercept) {
+                if (fetchMode != -1 && !decideIntercept) {
                     final float curX = event.getX();
                     final float curY = event.getY();
+                    xDelta = curX - xDown;
+                    yDelta = curY - yDown;
 
-                    xDelta = curX - xLast;
-                    yDelta = curY - yLast;
-
-                    if (yDelta < 0 && Math.abs(yDelta) > Math.abs(xDelta)) {
-                        if (mode == 0)
+                    // 过滤无效滑动事件
+                    if (Math.abs(xDelta) < 2 && Math.abs(yDelta) < 2) {
+                        return false;
+                    }
+                    // 根据xDelta/yDelta判断
+                    if (fetchMode == 0) {
+                        if (Math.abs(yDelta) >= 2 * Math.abs(xDelta)) {
                             intercepted = true;
-                        else if (mode == 1) {
-                            if (isScrollAtBottom((ScrollView) findViewById(R.id.scroll_left)))
-                                intercepted = true;
+                            decideIntercept = true;
+                        }
+                    } else if (fetchMode == 1) {
+                        if (yDelta < 0 && Math.abs(yDelta) > 3 * Math.abs(xDelta)) {
+                            intercepted = true;
+                            decideIntercept = true;
                         }
                     }
-                    decideIntercept = true;
+                    // 在一定时间内判定滑动模式
+                    long downTime = event.getDownTime();
+                    long curTime = event.getEventTime();
+                    if (curTime - downTime > 200) {
+                        decideIntercept = true;
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -200,26 +213,36 @@ public class DragViewGroup_Slide extends LinearLayout {
         return true;
     }
 
-
     private boolean inRangeOfView(View view, MotionEvent ev) {
         int[] location = new int[2];
         view.getLocationOnScreen(location);
         int x = location[0];
         int y = location[1];
-        if (ev.getRawX()< x || ev.getRawX() > (x + view.getWidth()) || ev.getRawY() < y || ev.getRawY() > (y + view.getHeight())) {
+        if (ev.getRawX() < x || ev.getRawX() > (x + view.getWidth()) || ev.getRawY() < y || ev.getRawY() > (y + view
+                .getHeight())) {
             return false;
         }
         return true;
     }
 
+    /**
+     * 判定是否滑动到顶部（宽松判断约10px）
+     *
+     * @return
+     */
     public static boolean isScrollAtTop(View scrollView) {
         int scrollY = scrollView.getScrollY();
-        return scrollY == 0;
+        return scrollY < 10;
     }
 
-    public static boolean isScrollAtBottom(ScrollView scrollView) {
+    /**
+     * 判定是否滑动到底部（宽松判断约10px）
+     *
+     * @return
+     */
+    public static boolean isScrollAtBottom(ViewGroup scrollView) {
         int scrollY = scrollView.getScrollY();
-        return scrollY == scrollView.getChildAt(0).getHeight() - scrollView.getHeight();
+        return scrollY + 10 > scrollView.getChildAt(0).getHeight() - scrollView.getHeight();
     }
 
     public boolean isSliding() {

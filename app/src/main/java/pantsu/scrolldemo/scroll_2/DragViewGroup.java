@@ -145,7 +145,8 @@ public class DragViewGroup extends LinearLayout {
 
     /*
         Calling updateBound() is necessary if this container's LayoutParams has been changed !
-        but setLayoutParams() does not impact getHeight() immediately~
+        but setLayoutParams() does not impact getHeight() immediately,
+        so call setBound(maxX, minX, maxY, minY) directly ~
     */
     public void updateBound() {
         View child = mDragHelper.findTopChildUnder(0, 0);

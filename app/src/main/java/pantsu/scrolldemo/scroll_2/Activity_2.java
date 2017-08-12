@@ -39,13 +39,15 @@ public class Activity_2 extends Activity implements View.OnTouchListener {
     private static final int WRAP = LinearLayout.LayoutParams.WRAP_CONTENT;
     private static final int MATCH = LinearLayout.LayoutParams.MATCH_PARENT;
 
+    int rate = 2;
+
     private void configureLayout() {
         final int width = MainActivity.displayMetrics.widthPixels;
         int height = MainActivity.displayMetrics.heightPixels - MainActivity.statusBarHeight;
-        final int w1 = 70, _w = 870;
-        final int h1 = 100, h2 = 84, h3 = 100, _h = 1160;
-        int w1_banner = 118, _w_banner = 2406;
-        final int h_banner = 188, h_container = height - h1 - h2 - h3, h_container_shrink = h_container - h_banner;
+        final int w1 = 70 * rate, _w = 870 * rate;
+        final int h1 = 100 * rate, h2 = 84 * rate, h3 = 100 * rate, _h = 1160 * rate;
+        int w1_banner = 118 * rate, _w_banner = 2406 * rate;
+        final int h_banner = 188 * rate, h_container = height - h1 - h2 - h3, h_container_shrink = h_container - h_banner;
 
         findViewById(R.id.corner).setLayoutParams(getLinearParams(w1, h2));
         findViewById(R.id.top).setLayoutParams(getLinearParams(_w, h2));
@@ -56,35 +58,34 @@ public class Activity_2 extends Activity implements View.OnTouchListener {
         dragViewGroup = ((DragViewGroup) findViewById(R.id.dragGroup));
         dragViewGroupSlide = (DragViewGroup_Slide) findViewById(R.id.dragGroupSlide);
 
-
         title = (ImageView) findViewById(R.id.title);
         title.setLayoutParams(getLinearParams(width, h1));
         title.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (dragViewGroupSlide.isSliding())
-                            return;
-                        if (dragViewGroupSlide.condition) {
+//                        if (dragViewGroupSlide.isSliding() && !dragViewGroupSlide.isSlidingSlow()) {
+//                            return;
+//                        }
+                        if (dragViewGroupSlide.condition == DragViewGroup_Slide.CONDITION_SHOW_OUT) {
                             dragViewGroupSlide.slideIn();
                             title.setImageResource(R.drawable.a_title);
                             container_center.setLayoutParams(getLinearParams(width, h_container));
                             dragViewGroup.setBound(0, width - _w, 0, h_container - _h);
 
-                            dragViewGroupSlide.condition = false;
+                            dragViewGroupSlide.condition = DragViewGroup_Slide.CONDITION_WRAP_IN;
                         } else {
                             dragViewGroupSlide.slideOut();
                             title.setImageResource(R.drawable.a_title_2);
                             container_center.setLayoutParams(getLinearParams(width, h_container_shrink));
                             dragViewGroup.setBound(0, width - _w, 0, h_container_shrink - _h);
 
-                            dragViewGroupSlide.condition = true;
+                            dragViewGroupSlide.condition = DragViewGroup_Slide.CONDITION_SHOW_OUT;
                         }
                         dragViewGroup.dragChildTo(-scroll_top.getScrollX(), -scroll_left.getScrollY());
                     }
                 }
         );
-
 
         LinearLayout slide = (LinearLayout) findViewById(R.id.slide);
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) slide.getLayoutParams();
@@ -125,7 +126,7 @@ public class Activity_2 extends Activity implements View.OnTouchListener {
 
             @Override
             public void onViewReleased(View releasedChild, float xvel, float yvel) {
-                if (dragViewGroupSlide.condition) {
+                if (dragViewGroupSlide.condition == DragViewGroup_Slide.CONDITION_SHOW_OUT) {
                     title.setImageResource(R.drawable.a_title_2);
                     container_center.setLayoutParams(getLinearParams(width, h_container_shrink));
                     dragViewGroup.setBound(0, width - _w, 0, h_container_shrink - _h);

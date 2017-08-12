@@ -33,11 +33,13 @@ public class Activity_1 extends Activity implements View.OnTouchListener {
         configureLayout();
     }
 
+    int rate = 2;
+
     private void configureLayout() {
         int width = MainActivity.displayMetrics.widthPixels;
         int height = MainActivity.displayMetrics.heightPixels;
-        int w1 = 70, _w = 870;
-        int h1 = 100, h2 = 84, h3 = 100, _h = 1160;
+        int w1 = 70 * rate, _w = 870 * rate;
+        int h1 = 100 * rate, h2 = 84 * rate, h3 = 100 * rate, _h = 1160 * rate;
         findViewById(R.id.title).setLayoutParams(getLinearParams(width, h1));
         findViewById(R.id.corner).setLayoutParams(getLinearParams(w1, h2));
         findViewById(R.id.top).setLayoutParams(getLinearParams(_w, h2));
@@ -89,8 +91,9 @@ public class Activity_1 extends Activity implements View.OnTouchListener {
                         startX = currentX;
                         startY = currentY;
 
-                        if (Math.abs(deltaX) + Math.abs(deltaX) < ViewConfiguration.get(this).getScaledTouchSlop())
+                        if (Math.abs(deltaX) + Math.abs(deltaX) < ViewConfiguration.get(this).getScaledTouchSlop()) {
                             break;
+                        }
 
                         scroll_h.smoothScrollBy(deltaX, 0);
                         scroll_v.smoothScrollBy(0, deltaY);
