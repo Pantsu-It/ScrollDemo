@@ -33,6 +33,9 @@
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
 
         <activity
+            android:name=".scroll_4.Activity_4"
+            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+        <activity
             android:name=".scroll_5.Activity_5"
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
         <activity

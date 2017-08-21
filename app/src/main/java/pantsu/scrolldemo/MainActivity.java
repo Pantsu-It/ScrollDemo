@@ -17,6 +17,7 @@ import android.view.View;
 import pantsu.scrolldemo.scroll_1.Activity_1;
 import pantsu.scrolldemo.scroll_2.Activity_2;
 import pantsu.scrolldemo.scroll_3.Activity_3;
+import pantsu.scrolldemo.scroll_4.Activity_4;
 import pantsu.scrolldemo.scroll_5.Activity_5;
 import pantsu.scrolldemo.scroll_6.Activity_6;
 import pantsu.scrolldemo.scroll_7.Activity_7;
@@ -74,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btn3:
                 intent = new Intent(MainActivity.this, Activity_3.class);
+                break;
+            case R.id.btn4:
+                intent = new Intent(MainActivity.this, Activity_4.class);
                 break;
             case R.id.btn5:
                 intent = new Intent(MainActivity.this, Activity_5.class);

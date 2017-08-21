@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#ffffff"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/content"
+        android:textColor="#555555"
+        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/operation"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/opTop"
+            android:text="置顶"
+            android:background="#C7C7CD"
+            android:textSize="16sp"
+            android:paddingLeft="18dp"
+            android:paddingRight="18dp"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/opRead"
+            android:text="标为未读"
+            android:background="#FA9D16"
+            android:textSize="16sp"
+            android:paddingLeft="18dp"
+            android:paddingRight="18dp"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/opDelete"
+            android:text="删除"
+            android:background="#F8372F"
+            android:textSize="16sp"
+            android:paddingLeft="18dp"
+            android:paddingRight="18dp"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+</LinearLayout>

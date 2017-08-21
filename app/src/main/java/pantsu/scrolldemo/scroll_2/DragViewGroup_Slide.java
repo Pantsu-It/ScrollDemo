@@ -171,8 +171,8 @@ public class DragViewGroup_Slide extends LinearLayout {
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (fetchMode != -1 && !decideIntercept) {
-                    final float curX = event.getX();
-                    final float curY = event.getY();
+                    float curX = event.getX();
+                    float curY = event.getY();
                     xDelta = curX - xDown;
                     yDelta = curY - yDown;
 
