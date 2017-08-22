@@ -7,11 +7,11 @@
     android:background="#ffffff"
     tools:context=".scroll_6.Activity_6">
 
-    <pantsu.scrolldemo.scroll_4.ScrollControllListView
+    <pantsu.scrolldemo.scroll_4.ScrollControlListView
         android:background="#ffeaecf4"
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </pantsu.scrolldemo.scroll_4.ScrollControllListView>
+    </pantsu.scrolldemo.scroll_4.ScrollControlListView>
 
 </LinearLayout>

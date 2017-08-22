@@ -3,13 +3,10 @@ package pantsu.scrolldemo.scroll_4;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import pantsu.scrolldemo.MainActivity;
 import pantsu.scrolldemo.R;
@@ -20,15 +17,33 @@ public class SimpleDataAdapter extends BaseAdapter {
     private Context context;
 
     {
-        boolean[] op0 = {false, false, false};
         boolean[] op1 = {true, false, false};
         boolean[] op2 = {true, true, false};
         boolean[] op3 = {true, true, true};
+        boolean[] op4 = {true, true, true};
+        boolean[] op5 = {true, false, false};
+        boolean[] op6 = {true, true, false};
+        boolean[] op7 = {true, true, true};
+        boolean[] op8 = {true, true, true};
+        boolean[] op9 = {true, false, false};
+        boolean[] op10 = {true, true, false};
+        boolean[] op11 = {true, true, true};
+        boolean[] op12 = {true, true, true};
+        boolean[] op13 = {true, true, true};
         dataItemList = new ArrayList<>(4);
-        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op0));
         dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op1));
         dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op2));
         dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op3));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op4));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op5));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op6));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op7));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op8));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op9));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op10));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op11));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op12));
+        dataItemList.add(new DataItem("我我我我我我我我我我问问我我", op13));
     }
 
     public SimpleDataAdapter(Context context) {
@@ -52,20 +67,26 @@ public class SimpleDataAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View rootView;
+        int displayWidth = MainActivity.displayMetrics.widthPixels;
+        float density = MainActivity.displayMetrics.density;
+        int cellHeight = (int) (72 * density);
+
+        IScrollView iScrollView;
         if (convertView == null) {
-            convertView = View.inflate(context, R.layout.item_cell_4, null);
+            iScrollView = new IScrollView(context, displayWidth, cellHeight);
+            iScrollView.setContentView(View.inflate(context, R.layout.item_cell_4, null));
+            iScrollView.setOptionView(View.inflate(context, R.layout.item_cell_4_option, null));
+        } else {
+            iScrollView = (IScrollView) convertView;
         }
-        rootView = convertView;
-        rootView.setTag(R.id.tag_type, "item");
-        rootView.setTag(R.id.tag_mark, position);
+        iScrollView.setTag(R.id.tag_mark, position);
 
         DataItem dataItem = getItem(position);
-        bindView(dataItem, rootView);
-        return rootView;
+        bindView(dataItem, iScrollView);
+        return iScrollView;
     }
 
-    private void bindView(DataItem dataItem, View view) {
+    private void bindView(DataItem dataItem, ViewGroup view) {
         TextView content = (TextView) view.findViewById(R.id.content);
         TextView opTop = (TextView) view.findViewById(R.id.opTop);
         TextView opRead = (TextView) view.findViewById(R.id.opRead);
@@ -75,25 +96,6 @@ public class SimpleDataAdapter extends BaseAdapter {
         opTop.setVisibility(dataItem.operations[0] ? View.VISIBLE : View.GONE);
         opRead.setVisibility(dataItem.operations[1] ? View.VISIBLE : View.GONE);
         opDelete.setVisibility(dataItem.operations[2] ? View.VISIBLE : View.GONE);
-
-        int displayWidth = MainActivity.displayMetrics.widthPixels;
-        float density = MainActivity.displayMetrics.density;
-        int cellHeight = (int) (72 * density);
-
-//                view.setLayoutParams(getLayoutParams(view, LinearLayout.LayoutParams.WRAP_CONTENT, cellHeight));
-        view.setLayoutParams(getLayoutParams(view, (int) (displayWidth * 2), cellHeight));
-        content.setLayoutParams(getLayoutParams(content, displayWidth, cellHeight));
-    }
-
-    private LinearLayout.LayoutParams getLayoutParams(View view, int width, int height) {
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-        if (params == null) {
-            params = new LinearLayout.LayoutParams(width, height);
-        } else {
-            params.width = width;
-            params.height = height;
-        }
-        return params;
     }
 
     private static class DataItem {

@@ -2,24 +2,20 @@ package pantsu.scrolldemo.scroll_4;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.Toast;
 import pantsu.scrolldemo.R;
-import pantsu.scrolldemo.scroll_5.MyRecyclerView;
-import pantsu.scrolldemo.scroll_5.SimpleAdapter;
-import pantsu.scrolldemo.scroll_5.SpaceItemDecoration;
 
 /**
- * Created by Pantsu on 2016/3/22.
- * <p/>
+ * Created by Pantsu on 2016/8/21.
+ * <p>
  * Blog -> http://pantsu-it.github.io/
  */
 public class Activity_4 extends Activity {
 
-    ScrollControllListView recyclerView;
+    ScrollControlListView listView;
     ListAdapter holderAdapter;
 
     @Override
@@ -31,8 +27,21 @@ public class Activity_4 extends Activity {
     }
 
     private void configureLayout() {
-        recyclerView = (ScrollControllListView) findViewById(R.id.listView);
+        listView = (ScrollControlListView) findViewById(R.id.listView);
         holderAdapter = new SimpleDataAdapter(this);
-        recyclerView.setAdapter(holderAdapter);
+        listView.setAdapter(holderAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(Activity_4.this, "Content click", Toast.LENGTH_SHORT).show();
+            }
+        });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(Activity_4.this, "Content long-click", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 }

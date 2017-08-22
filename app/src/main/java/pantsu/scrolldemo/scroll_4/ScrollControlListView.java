@@ -14,12 +14,14 @@ import pantsu.scrolldemo.R;
 /**
  * Created by Pants on 2016/4/18.
  */
-public class ScrollControllListView extends ListView {
+public class ScrollControlListView extends ListView {
+
     private ViewDragHelper mDragHelper;
 
-    float conditionRate = 0.5f;
     private int minX, maxX, minY, maxY;
     private int curX;
+
+    private static final float conditionRate = 0.5f;
 
     private View lastCapturedView;
     private Object lastCapturedMark;
@@ -28,25 +30,26 @@ public class ScrollControllListView extends ListView {
     public static final int STATE_NORMAL = 0;
     public static final int STATE_SCROLLED = 1;
 
-    public ScrollControllListView(Context context) {
+    public ScrollControlListView(Context context) {
         super(context, null);
     }
 
-    public ScrollControllListView(Context context, @Nullable AttributeSet attrs) {
+    public ScrollControlListView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, -1);
     }
 
-    public ScrollControllListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+    public ScrollControlListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
-                if (lastCapturedView == child) {
-                    int y = (int) child.getY();
-                    setRange(-child.findViewById(R.id.operation).getWidth(), 0, y, y);
-                    return true;
-                } else if (child.getTag(R.id.tag_type) != null && ((String) child.getTag(R.id.tag_type)).equals("item")) {
+//                if (lastCapturedView == child) {
+//                int y = (int) child.getY();
+//                setRange(-child.findViewById(R.id.operation).getWidth(), 0, y, y);
+//                    return true;
+//                } else
+                if (child.getTag(R.id.tag_type) != null && child.getTag(R.id.tag_type).equals("scroll")) {
                     int y = (int) child.getY();
                     setRange(-child.findViewById(R.id.operation).getWidth(), 0, y, y);
                     lastCapturedView = child;
@@ -81,25 +84,14 @@ public class ScrollControllListView extends ListView {
                 super.onViewReleased(releasedChild, xvel, yvel);
 
                 if (xvel > 1200) {
-                    mDragHelper.smoothSlideViewTo(releasedChild, maxX, maxY);
-                    lastCapturedState = STATE_NORMAL;
-                    lastCapturedView = null;
-                    postInvalidate();
+                    smoothScrollItemToState(STATE_NORMAL);
                 } else if (xvel < -1200) {
-                    mDragHelper.smoothSlideViewTo(releasedChild, minX, maxY);
-                    lastCapturedState = STATE_SCROLLED;
-                    postInvalidate();
+                    smoothScrollItemToState(STATE_SCROLLED);
                 } else if (curX < minX + conditionRate * (maxX - minX)) {
-                    mDragHelper.smoothSlideViewTo(releasedChild, minX, maxY);
-                    lastCapturedState = STATE_SCROLLED;
-                    postInvalidate();
+                    smoothScrollItemToState(STATE_SCROLLED);
                 } else {
-                    mDragHelper.smoothSlideViewTo(releasedChild, maxX, maxY);
-                    lastCapturedState = STATE_NORMAL;
-                    lastCapturedView = null;
-                    postInvalidate();
+                    smoothScrollItemToState(STATE_NORMAL);
                 }
-
                 isScrolling = true;
             }
 
@@ -113,6 +105,25 @@ public class ScrollControllListView extends ListView {
         }
     }
 
+    private void smoothScrollItemToState(int state) {
+        lastCapturedState = state;
+        if (state == STATE_NORMAL) {
+            mDragHelper.smoothSlideViewTo(lastCapturedView, maxX, maxY);
+        } else if (state == STATE_SCROLLED) {
+            mDragHelper.smoothSlideViewTo(lastCapturedView, minX, maxY);
+        }
+        postInvalidate();
+    }
+
+    private void scrollItemToState(View capturedView, int state) {
+        mDragHelper.captureChildView(capturedView, 0);
+        if (state == STATE_NORMAL) {
+            mDragHelper.settleCapturedViewAt(maxX, maxY);
+        } else if (state == STATE_SCROLLED) {
+            mDragHelper.settleCapturedViewAt(minX, maxY);
+        }
+        postInvalidate();
+    }
 
     public void setRange(int minX, int maxX, int minY, int maxY) {
         this.minX = minX;
@@ -139,25 +150,24 @@ public class ScrollControllListView extends ListView {
                 yDown = event.getY();
 
                 // the last captured view is scrolling or in SCROLLED_STATE ~
-                if (lastCapturedView != null && inRangeOfView(lastCapturedView, event)) {
-                    isScrolling = false;
-
-                    decideIntercept = true;
-                    intercepted = true;
-                } else {
+//                if (lastCapturedView != null && inRangeOfView(lastCapturedView, event)) {
+//                    isScrolling = false;
+//
+//                    decideIntercept = true;
+//                    intercepted = true;
+//                } else {
                     if (lastCapturedView != null && lastCapturedState != STATE_NORMAL) {
                         decideIntercept = true;
                         intercepted = false;
                         // scroll last captured view to NORMAL_STATE
-                        mDragHelper.smoothSlideViewTo(lastCapturedView, maxX, maxY);
-                        postInvalidate();
+                        smoothScrollItemToState(STATE_NORMAL);
                         lastCapturedView = null;
                         lastCapturedMark = null;
                     } else {
                         decideIntercept = false;
                         intercepted = false;
                     }
-                }
+//                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (!decideIntercept) {
@@ -168,22 +178,21 @@ public class ScrollControllListView extends ListView {
 
                     Log.d("foobar", Math.abs(xDelta) + " + " + Math.abs(yDelta) + " = " + (Math.abs(xDelta) + Math.abs
                             (yDelta)));
-                    if (Math.abs(xDelta) + Math.abs(yDelta) > 30) {
-                        decideIntercept = true;
-                    } else if (Math.abs(xDelta) > 1.6f * Math.abs(yDelta)) {
+                    if (Math.abs(xDelta) > 1.6f * Math.abs(yDelta)) {
                         intercepted = true;
                         decideIntercept = true;
                     }
 
-//                    if (xDelta > 0) {
-//                        intercepted = false;
-//                        decideIntercept = true;
-//                    }
-//                    long downTime = event.getDownTime();
-//                    long curTime = event.getEventTime();
-//                    if (curTime - downTime > 200) {
-//                        decideIntercept = true;
-//                    }
+                    if (Math.abs(xDelta) + Math.abs(yDelta) > 30) {
+                        intercepted = false;
+                        decideIntercept = true;
+                    } else {
+                        long downTime = event.getDownTime();
+                        long curTime = event.getEventTime();
+                        if (curTime - downTime > 200) {
+                            decideIntercept = true;
+                        }
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -232,7 +241,31 @@ public class ScrollControllListView extends ListView {
         return true;
     }
 
+    public View getLastScrolledViewItem() {
+        if (lastCapturedView != null && lastCapturedState == STATE_SCROLLED) {
+            return lastCapturedView;
+        }
+        return null;
+    }
+
+    public Object getLastScrolledViewMark() {
+        if (lastCapturedView != null && lastCapturedState == STATE_SCROLLED) {
+            return lastCapturedMark;
+        }
+        return null;
+    }
+
+    public void updateScrolledItem(View view, Object mark) {
+        lastCapturedState = STATE_SCROLLED;
+        lastCapturedView = view;
+        lastCapturedMark = mark;
+        scrollItemToState(view, STATE_SCROLLED);
+    }
+
     public void clearScrollItem() {
+        if (lastCapturedView != null && lastCapturedState == STATE_SCROLLED) {
+            scrollItemToState(lastCapturedView, STATE_NORMAL);
+        }
         lastCapturedView = null;
         lastCapturedMark = null;
         lastCapturedState = STATE_NORMAL;
