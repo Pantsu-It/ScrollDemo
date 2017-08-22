@@ -51,6 +51,14 @@ public class IScrollView extends LinearLayout {
         addView(optionView, 1);
     }
 
+    public View getContentView() {
+        return mContentView;
+    }
+
+    public View getOptionView() {
+        return mOptionView;
+    }
+
     private LinearLayout.LayoutParams getLayoutParams(View view, int width, int height) {
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
         if (params == null) {

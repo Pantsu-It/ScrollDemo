@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import pantsu.scrolldemo.MainActivity;
 import pantsu.scrolldemo.R;
 
@@ -15,17 +16,18 @@ public class SimpleDataAdapter extends BaseAdapter {
 
     private List<DataItem> dataItemList;
     private Context context;
+    private IScrollListener mIScrollListener;
 
     {
-        boolean[] op1 = {true, false, false};
+        boolean[] op1 = {true, true, false};
         boolean[] op2 = {true, true, false};
         boolean[] op3 = {true, true, true};
         boolean[] op4 = {true, true, true};
-        boolean[] op5 = {true, false, false};
+        boolean[] op5 = {true, true, false};
         boolean[] op6 = {true, true, false};
         boolean[] op7 = {true, true, true};
         boolean[] op8 = {true, true, true};
-        boolean[] op9 = {true, false, false};
+        boolean[] op9 = {true, true, false};
         boolean[] op10 = {true, true, false};
         boolean[] op11 = {true, true, true};
         boolean[] op12 = {true, true, true};
@@ -96,6 +98,9 @@ public class SimpleDataAdapter extends BaseAdapter {
         opTop.setVisibility(dataItem.operations[0] ? View.VISIBLE : View.GONE);
         opRead.setVisibility(dataItem.operations[1] ? View.VISIBLE : View.GONE);
         opDelete.setVisibility(dataItem.operations[2] ? View.VISIBLE : View.GONE);
+        opTop.setOnClickListener(onClickListener);
+        opRead.setOnClickListener(onClickListener);
+        opDelete.setOnClickListener(onClickListener);
     }
 
     private static class DataItem {
@@ -108,5 +113,28 @@ public class SimpleDataAdapter extends BaseAdapter {
         }
 
     }
+
+    private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.opTop:
+                    Toast.makeText(context, "Top", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.opRead:
+                    Toast.makeText(context, "Read", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.opDelete:
+                    Toast.makeText(context, "Delete", Toast.LENGTH_SHORT).show();
+                    break;
+
+            }
+            mIScrollListener.resetScrollState();
+        }
+    };
+
+   public void setIScrollListener(IScrollListener iScrollListener) {
+       mIScrollListener = iScrollListener;
+   }
 
 }
