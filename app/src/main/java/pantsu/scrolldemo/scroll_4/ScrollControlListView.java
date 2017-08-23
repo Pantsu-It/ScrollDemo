@@ -112,7 +112,6 @@ public class ScrollControlListView extends ListView {
     }
 
     private void scrollItemToState(View capturedView, int state) {
-        mDragHelper.captureChildView(capturedView, 0);
         if (state == STATE_NORMAL) {
             capturedView.offsetLeftAndRight(maxX - capturedView.getLeft());
             postInvalidate();
@@ -159,7 +158,7 @@ public class ScrollControlListView extends ListView {
                         // scroll last captured view to NORMAL_STATE
                         smoothScrollItemToState(STATE_NORMAL);
                         valid = false;
-                        lastCapturedView = null;
+//                        lastCapturedView = null;
                         lastCapturedMark = null;
                     }
                 } else {
@@ -205,11 +204,9 @@ public class ScrollControlListView extends ListView {
                     float curY = event.getY();
                     xDelta = curX - xDown;
                     yDelta = curY - yDown;
+                    Log.d("foobar", "ACTION_UP" + " delta:" + (Math.abs(xDelta) + Math.abs(yDelta)));
 
-                    long downTime = event.getDownTime();
-                    long curTime = event.getEventTime();
-                    Log.d("foobar", "ACTION_UP" + " time:" + (curTime-downTime));
-                    if (Math.abs(xDelta) + Math.abs(yDelta) > 30 || curTime - downTime < 1000) {
+                    if (Math.abs(xDelta) + Math.abs(yDelta) < 30) {
                         View optionView = lastCapturedView.getOptionView();
                         if (optionView != null && inRangeOfView(optionView, event)) {
                             if (optionView instanceof ViewGroup) {
@@ -217,7 +214,7 @@ public class ScrollControlListView extends ListView {
                                 for (int i = 0; i < optionViewGroup.getChildCount(); ++i) {
                                     View view = optionViewGroup.getChildAt(i);
                                     if (inRangeOfView(view, event)) {
-                                        view.callOnClick();
+                                        lastCapturedView.triggerOptionClickListener(view);
                                         smoothScrollItemToState(STATE_NORMAL);
                                         break;
                                     }
@@ -289,6 +286,7 @@ public class ScrollControlListView extends ListView {
         return null;
     }
 
+    // TODO: 2017/8/23 公用方法需要检查state状态
     public void updateScrolledItem(View view, Object mark) {
         lastCapturedState = STATE_SCROLLED;
         lastCapturedView = (IScrollView) view;
@@ -296,11 +294,12 @@ public class ScrollControlListView extends ListView {
         scrollItemToState(view, STATE_SCROLLED);
     }
 
+    // TODO: 2017/8/23 公用方法需要检查state状态
     public void clearScrollItem() {
         if (lastCapturedView != null && lastCapturedState == STATE_SCROLLED) {
             scrollItemToState(lastCapturedView, STATE_NORMAL);
         }
-        lastCapturedView = null;
+//        lastCapturedView = null;
         lastCapturedMark = null;
         lastCapturedState = STATE_NORMAL;
     }

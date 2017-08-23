@@ -13,6 +13,7 @@ public class IScrollView extends LinearLayout {
 
     private View mContentView;
     private View mOptionView;
+    private OnClickListener mOptionClickListener;
 
     private int mContentWidth, mHeight;
 
@@ -57,6 +58,16 @@ public class IScrollView extends LinearLayout {
 
     public View getOptionView() {
         return mOptionView;
+    }
+
+    public void setOptionClickListener(OnClickListener onClickListener) {
+        mOptionClickListener = onClickListener;
+    }
+
+    public void triggerOptionClickListener(View optionView) {
+        if (mOptionClickListener != null) {
+            mOptionClickListener.onClick(optionView);
+        }
     }
 
     private LinearLayout.LayoutParams getLayoutParams(View view, int width, int height) {

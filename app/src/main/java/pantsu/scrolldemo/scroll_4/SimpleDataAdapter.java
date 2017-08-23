@@ -82,6 +82,7 @@ public class SimpleDataAdapter extends BaseAdapter {
             iScrollView = (IScrollView) convertView;
         }
         iScrollView.setTag(R.id.tag_mark, position);
+        iScrollView.setOptionClickListener(onClickListener);
 
         DataItem dataItem = getItem(position);
         bindView(dataItem, iScrollView);
@@ -98,9 +99,6 @@ public class SimpleDataAdapter extends BaseAdapter {
         opTop.setVisibility(dataItem.operations[0] ? View.VISIBLE : View.GONE);
         opRead.setVisibility(dataItem.operations[1] ? View.VISIBLE : View.GONE);
         opDelete.setVisibility(dataItem.operations[2] ? View.VISIBLE : View.GONE);
-        opTop.setOnClickListener(onClickListener);
-        opRead.setOnClickListener(onClickListener);
-        opDelete.setOnClickListener(onClickListener);
     }
 
     private static class DataItem {
@@ -129,7 +127,6 @@ public class SimpleDataAdapter extends BaseAdapter {
                     break;
 
             }
-            mIScrollListener.resetScrollState();
         }
     };
 
