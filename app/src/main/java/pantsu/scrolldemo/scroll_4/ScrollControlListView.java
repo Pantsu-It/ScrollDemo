@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import pantsu.scrolldemo.R;
 
@@ -33,6 +34,8 @@ public class ScrollControlListView extends ListView {
     public static final int STATE_NORMAL = 0;
     public static final int STATE_SCROLLED = 1;
 
+    private OnScrollListener mOnScrollListener;
+
     public ScrollControlListView(Context context) {
         super(context, null);
     }
@@ -43,6 +46,41 @@ public class ScrollControlListView extends ListView {
 
     public ScrollControlListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        super.setOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (mOnScrollListener != null) {
+                    mOnScrollListener.onScrollStateChanged(view, scrollState);
+                }
+                Log.d("test2",
+                        String.format("state:%d decide:%b interp:%b", scrollState, decideIntercept, intercepted));
+                if (scrollState == STATE_SCROLLED && decideIntercept && intercepted) {
+                    Log.d("test2", "~~~~~");
+                    Integer pos = (Integer) lastCapturedView.getTag(R.id.tag_position);
+                    if (pos != null) {
+                        int y;
+                        if (pos == 0) {
+                            y = 0;
+                        } else {
+                            View sideView = getChildAt(pos - 1);
+                            y = (int) (sideView.getY() + sideView.getHeight());
+                        }
+                        if (y != maxY) {
+                            setRange(-lastCapturedView.findViewById(R.id.operation).getWidth(), 0, y, y);
+                            requestLayout();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (mOnScrollListener != null) {
+                    mOnScrollListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+                }
+            }
+        });
 
         mDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
@@ -292,6 +330,11 @@ public class ScrollControlListView extends ListView {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void setOnScrollListener(OnScrollListener l) {
+        mOnScrollListener = l;
     }
 
     public View getLastScrolledViewItem() {
