@@ -27,6 +27,8 @@ public class ScrollControlListView extends ListView {
     private IScrollView lastCapturedView;
     private Object lastCapturedMark;
     private int lastCapturedState;
+    /** 用于短时间连续点击和滑动列表，导致lastCapturedView指向另一个View 以及 前一个View没有完全滑动到正常位置 */
+    private IScrollView cachedCapturedView;
 
     public static final int STATE_NORMAL = 0;
     public static final int STATE_SCROLLED = 1;
@@ -48,6 +50,7 @@ public class ScrollControlListView extends ListView {
                 if (child.getTag(R.id.tag_type) != null && child.getTag(R.id.tag_type).equals("scroll")) {
                     int y = (int) child.getY();
                     setRange(-child.findViewById(R.id.operation).getWidth(), 0, y, y);
+                    cachedCapturedView = lastCapturedView;
                     lastCapturedView = (IScrollView) child;
                     lastCapturedMark = child.getTag(R.id.tag_mark);
                     return true;
@@ -147,7 +150,7 @@ public class ScrollControlListView extends ListView {
                 xDown = event.getX();
                 yDown = event.getY();
 
-                if (lastCapturedView != null && lastCapturedState != STATE_NORMAL) {
+                if (lastCapturedView != null && (lastCapturedState != STATE_NORMAL)) {
                     decideIntercept = true;
                     intercepted = true;
 
@@ -225,6 +228,15 @@ public class ScrollControlListView extends ListView {
                         }
                         smoothScrollItemToState(STATE_NORMAL);
                     }
+                } else {
+                    if (!intercepted && lastCapturedState == STATE_NORMAL) {
+                        if (!isScrolltoRightPosition(lastCapturedView, STATE_NORMAL)) {
+                            scrollItemToState(lastCapturedView, STATE_NORMAL);
+                        } else if (cachedCapturedView != null
+                                && !isScrolltoRightPosition(cachedCapturedView, STATE_NORMAL)) {
+                            scrollItemToState(cachedCapturedView, STATE_NORMAL);
+                        }
+                    }
                 }
                 break;
         }
@@ -267,6 +279,16 @@ public class ScrollControlListView extends ListView {
         int y = location[1];
         if (ev.getRawX() < x || ev.getRawX() > (x + view.getWidth()) || ev.getRawY() < y || ev.getRawY() > (y + view
                 .getHeight())) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isScrolltoRightPosition(View view, int state) {
+        if (state == STATE_NORMAL) {
+            if (view.getLeft() == maxX) {
+                return true;
+            }
             return false;
         }
         return true;
